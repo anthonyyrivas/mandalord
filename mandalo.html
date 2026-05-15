@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mándalo — Paga con tarjeta. Llega en efectivo.</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  :root{--ink:#0A0A0F;--paper:#F5F2EB;--gold:#C9A84C;--gold-light:#E8C96A;--gold-dim:#8B6E2A;--cream:#FAF8F2;--muted:#6B6558;--border:rgba(201,168,76,0.25);--shadow:0 20px 60px rgba(10,10,15,0.12);}
+  html{scroll-behavior:smooth;}
+  body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);overflow-x:hidden;cursor:none;}
+  .cursor{width:12px;height:12px;background:var(--gold);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .3s,height .3s;mix-blend-mode:multiply;}
+  .cursor-ring{width:36px;height:36px;border:1.5px solid var(--gold);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all .15s ease;opacity:.6;}
+  body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:1000;opacity:.4;}
+
+  /* NAV */
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 48px;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(12px);background:rgba(245,242,235,0.88);border-bottom:1px solid var(--border);}
+  .nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;letter-spacing:-.03em;color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:10px;}
+  .nav-logo span{background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+  .logo-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--gold),var(--gold-light));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+  .nav-links{display:flex;align-items:center;gap:36px;list-style:none;}
+  .nav-links a{font-size:.875rem;color:var(--muted);text-decoration:none;transition:color .2s;}
+  .nav-links a:hover{color:var(--ink);}
+  .nav-cta{background:var(--ink)!important;color:var(--paper)!important;padding:10px 22px;border-radius:100px;font-weight:500!important;transition:background .2s,transform .2s!important;}
+  .nav-cta:hover{background:var(--gold)!important;color:var(--ink)!important;transform:translateY(-1px);}
+
+  /* HERO */
+  .hero{min-height:100vh;padding:140px 48px 80px;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;max-width:1280px;margin:0 auto;}
+  .hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(201,168,76,.12);border:1px solid var(--border);border-radius:100px;padding:6px 16px;font-size:.78rem;font-weight:500;color:var(--gold-dim);letter-spacing:.06em;text-transform:uppercase;margin-bottom:28px;width:fit-content;animation:fadeUp .8s ease forwards;}
+  .badge-dot{width:6px;height:6px;background:var(--gold);border-radius:50%;animation:pulse 2s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
+  .hero-title{font-family:'Syne',sans-serif;font-size:clamp(2.8rem,5.2vw,4.8rem);font-weight:800;line-height:.95;letter-spacing:-.04em;color:var(--ink);margin-bottom:28px;animation:fadeUp .8s .1s ease both;}
+  .hero-title em{font-style:normal;background:linear-gradient(135deg,var(--gold),var(--gold-light) 60%,var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-size:200% 200%;animation:shimmer 4s ease infinite;}
+  @keyframes shimmer{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+  .hero-subtitle{font-size:1.05rem;line-height:1.65;color:var(--muted);font-weight:300;max-width:480px;margin-bottom:40px;animation:fadeUp .8s .2s ease both;}
+  .hero-actions{display:flex;align-items:center;gap:16px;flex-wrap:wrap;animation:fadeUp .8s .3s ease both;}
+  .btn-primary{background:var(--ink);color:var(--paper);padding:16px 32px;border-radius:100px;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:500;text-decoration:none;border:none;cursor:none;display:inline-flex;align-items:center;gap:10px;transition:transform .25s,box-shadow .25s,background .25s;box-shadow:0 4px 20px rgba(10,10,15,.2);}
+  .btn-primary:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(10,10,15,.25);background:var(--gold);color:var(--ink);}
+  .btn-primary svg{transition:transform .2s;}.btn-primary:hover svg{transform:translateX(4px);}
+  .btn-whatsapp{background:#25D366;color:#fff;padding:16px 28px;border-radius:100px;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:500;text-decoration:none;border:none;cursor:none;display:inline-flex;align-items:center;gap:10px;transition:transform .25s,box-shadow .25s;box-shadow:0 4px 20px rgba(37,211,102,.3);}
+  .btn-whatsapp:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(37,211,102,.4);}
+  .hero-trust{margin-top:48px;display:flex;align-items:center;gap:24px;animation:fadeUp .8s .4s ease both;}
+  .trust-avatars{display:flex;}.trust-avatar{width:36px;height:36px;border-radius:50%;border:2.5px solid var(--paper);margin-left:-10px;background:linear-gradient(135deg,var(--gold-dim),var(--gold));display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:600;color:white;}.trust-avatar:first-child{margin-left:0;}
+  .trust-text{font-size:.85rem;color:var(--muted);line-height:1.4;}.trust-text strong{color:var(--ink);}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+  /* HERO CARD */
+  .hero-card-wrap{display:flex;justify-content:center;align-items:center;animation:fadeUp .8s .2s ease both;position:relative;}
+  .hero-card-wrap::before{content:'';position:absolute;width:320px;height:320px;background:radial-gradient(circle,rgba(201,168,76,.15) 0%,transparent 70%);border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;}
+  .transaction-card{background:var(--cream);border:1px solid var(--border);border-radius:28px;padding:32px;width:100%;max-width:420px;box-shadow:var(--shadow),0 0 0 1px rgba(255,255,255,.8) inset;position:relative;overflow:hidden;}
+  .transaction-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+  .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+  .card-header-label{font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:500;}
+  .card-step{background:rgba(201,168,76,.12);border:1px solid var(--border);color:var(--gold-dim);font-size:.75rem;font-weight:600;padding:4px 12px;border-radius:100px;}
+  .hero-amount-row{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+  .currency-badge{background:var(--gold);color:var(--ink);font-family:'Syne',sans-serif;font-weight:700;font-size:.8rem;padding:8px 14px;border-radius:12px;white-space:nowrap;}
+  .hero-amount-input{font-family:'Syne',sans-serif;font-size:2.4rem;font-weight:800;letter-spacing:-.04em;color:var(--ink);background:transparent;border:none;outline:none;width:100%;border-bottom:2px dashed rgba(201,168,76,.4);padding-bottom:4px;transition:border-color .2s;}
+  .hero-amount-input:focus{border-bottom-color:var(--gold);}
+  .hero-amount-hint{font-size:.72rem;color:var(--muted);margin-bottom:16px;}
+  .fee-breakdown{background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.15);border-radius:16px;padding:14px 16px;margin-bottom:18px;}
+  .fee-row{display:flex;justify-content:space-between;align-items:center;font-size:.84rem;padding:3px 0;}
+  .fee-row-label{color:var(--muted);}.fee-row-value{font-weight:500;color:var(--ink);}
+  .fee-row.total{border-top:1px solid var(--border);margin-top:8px;padding-top:10px;font-weight:600;font-size:.9rem;}
+  .fee-row.total .fee-row-value{color:var(--gold-dim);}
+  .recipient-row{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.7);border:1px solid rgba(201,168,76,.15);border-radius:14px;padding:12px 14px;margin-bottom:18px;}
+  .recipient-avatar{width:38px;height:38px;background:linear-gradient(135deg,#2D5A8E,#4A8FD4);border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:700;color:white;font-size:.85rem;flex-shrink:0;}
+  .recipient-info{flex:1;}.recipient-name{font-weight:500;font-size:.88rem;color:var(--ink);}.recipient-bank{font-size:.75rem;color:var(--muted);margin-top:2px;}
+  .recipient-check{width:22px;height:22px;background:#22C55E;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:11px;}
+  .send-btn-demo{width:100%;background:linear-gradient(135deg,var(--ink) 0%,#1a1a2e 100%);color:var(--paper);border:none;border-radius:14px;padding:16px;font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;cursor:none;display:flex;align-items:center;justify-content:center;gap:10px;transition:transform .2s,box-shadow .2s;box-shadow:0 8px 30px rgba(10,10,15,.25);}
+  .send-btn-demo:hover{transform:translateY(-2px);box-shadow:0 14px 40px rgba(10,10,15,.3);}
+  .card-footer-note{text-align:center;font-size:.72rem;color:var(--muted);margin-top:12px;display:flex;align-items:center;justify-content:center;gap:6px;}
+  .float-badge{position:absolute;background:var(--cream);border:1px solid var(--border);border-radius:14px;padding:10px 16px;font-size:.8rem;font-weight:500;box-shadow:0 8px 24px rgba(10,10,15,.1);display:flex;align-items:center;gap:8px;white-space:nowrap;}
+  .float-badge.top-left{top:-20px;left:-30px;animation:float1 5s ease-in-out infinite;}
+  .float-badge.bottom-right{bottom:20px;right:-30px;animation:float2 5s ease-in-out infinite;}
+  @keyframes float1{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-8px) rotate(-2deg)}}
+  @keyframes float2{0%,100%{transform:translateY(0) rotate(2deg)}50%{transform:translateY(-10px) rotate(2deg)}}
+
+  /* TICKER */
+  .ticker-section{background:var(--ink);padding:18px 0;overflow:hidden;}
+  .ticker-track{display:flex;animation:ticker 35s linear infinite;width:max-content;}
+  .ticker-item{display:flex;align-items:center;gap:12px;padding:0 40px;color:rgba(245,242,235,.5);font-size:.82rem;white-space:nowrap;}
+  .ticker-item strong{color:var(--gold);}
+  .ticker-dot{width:4px;height:4px;background:var(--gold);border-radius:50%;opacity:.4;}
+  @keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+  /* STATS */
+  .stats-outer{padding:60px 48px 0;}
+  .stats-section{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:var(--border);border:1px solid var(--border);border-radius:28px;overflow:hidden;max-width:1280px;margin:0 auto;}
+  .stat-item{background:var(--cream);padding:40px 32px;text-align:center;transition:background .3s;}
+  .stat-item:hover{background:rgba(201,168,76,.04);}
+  .stat-number{font-family:'Syne',sans-serif;font-size:3rem;font-weight:800;letter-spacing:-.05em;color:var(--ink);line-height:1;margin-bottom:10px;}
+  .stat-number span{background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+  .stat-label{font-size:.85rem;color:var(--muted);font-weight:300;line-height:1.4;}
+
+  /* SECTIONS */
+  .section{padding:120px 48px;max-width:1280px;margin:0 auto;}
+  .section-eyebrow{font-size:.75rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+  .section-eyebrow::before{content:'';width:28px;height:1.5px;background:var(--gold);}
+  .section-title{font-family:'Syne',sans-serif;font-size:clamp(2.2rem,3.5vw,3.5rem);font-weight:800;letter-spacing:-.04em;line-height:1.05;color:var(--ink);margin-bottom:20px;}
+  .section-subtitle{font-size:1.05rem;color:var(--muted);font-weight:300;max-width:500px;line-height:1.7;}
+
+  /* STEPS */
+  .steps-grid{margin-top:72px;display:grid;grid-template-columns:repeat(3,1fr);gap:28px;}
+  .step-card{background:var(--cream);border:1px solid var(--border);border-radius:24px;padding:36px 32px;position:relative;overflow:hidden;transition:transform .3s,box-shadow .3s;}
+  .step-card:hover{transform:translateY(-6px);box-shadow:var(--shadow);}
+  .step-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),var(--gold-light));transform:scaleX(0);transform-origin:left;transition:transform .4s;}
+  .step-card:hover::after{transform:scaleX(1);}
+  .step-number{font-family:'Syne',sans-serif;font-size:4rem;font-weight:800;letter-spacing:-.06em;color:rgba(201,168,76,.12);line-height:1;position:absolute;top:20px;right:24px;}
+  .step-icon{width:52px;height:52px;background:linear-gradient(135deg,var(--gold),var(--gold-light));border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:20px;box-shadow:0 8px 24px rgba(201,168,76,.3);}
+  .step-title{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;color:var(--ink);margin-bottom:10px;letter-spacing:-.02em;}
+  .step-desc{font-size:.9rem;color:var(--muted);line-height:1.65;font-weight:300;}
+
+  /* COST COMPARISON BLOCK */
+  .cost-section{background:var(--ink);padding:120px 48px;position:relative;overflow:hidden;}
+  .cost-section::before{content:'';position:absolute;top:-200px;left:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(239,68,68,.05) 0%,transparent 70%);border-radius:50%;pointer-events:none;}
+  .cost-inner{max-width:1280px;margin:0 auto;}
+  .cost-section .section-eyebrow{color:rgba(239,68,68,.7);}
+  .cost-section .section-eyebrow::before{background:#EF4444;}
+  .cost-section .section-title{color:var(--paper);}
+  .cost-section .section-subtitle{color:rgba(245,242,235,.5);}
+  .cost-grid{margin-top:60px;display:grid;grid-template-columns:1fr 1fr;gap:28px;}
+  .cost-bank-card{background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);border-radius:24px;padding:36px;}
+  .cost-bank-card .card-bank-name{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;color:var(--paper);margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+  .cost-bank-card .card-bank-logo{width:36px;height:36px;background:rgba(255,255,255,.1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+  .cost-line{display:flex;justify-content:space-between;align-items:flex-start;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06);gap:16px;}
+  .cost-line:last-child{border-bottom:none;}
+  .cost-line-label{font-size:.82rem;color:rgba(245,242,235,.5);font-weight:300;line-height:1.4;max-width:200px;}
+  .cost-line-value{font-size:.88rem;font-weight:600;color:#EF4444;white-space:nowrap;text-align:right;}
+  .cost-line-value.neutral{color:rgba(245,242,235,.6);}
+  .cost-total{margin-top:16px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);border-radius:12px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;}
+  .cost-total-label{font-size:.85rem;color:rgba(245,242,235,.7);font-weight:500;}
+  .cost-total-value{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;color:#EF4444;}
+  .cost-mandalo-card{background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.3);border-radius:24px;padding:36px;display:flex;flex-direction:column;justify-content:space-between;}
+  .cost-mandalo-card .card-bank-name{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;color:var(--paper);margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+  .mandalo-big-rate{font-family:'Syne',sans-serif;font-size:5rem;font-weight:800;letter-spacing:-.06em;line-height:1;color:var(--gold);margin-bottom:8px;}
+  .mandalo-big-rate span{font-size:2rem;}
+  .mandalo-rate-note{font-size:.85rem;color:rgba(245,242,235,.5);margin-bottom:28px;font-weight:300;}
+  .mandalo-perks{display:flex;flex-direction:column;gap:10px;}
+  .mandalo-perk{display:flex;align-items:center;gap:10px;font-size:.875rem;color:rgba(245,242,235,.7);font-weight:300;}
+  .perk-check{width:20px;height:20px;background:rgba(34,197,94,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#22C55E;font-size:11px;flex-shrink:0;}
+  .savings-banner{margin-top:32px;background:linear-gradient(135deg,rgba(201,168,76,.15),rgba(201,168,76,.05));border:1px solid rgba(201,168,76,.3);border-radius:16px;padding:20px 24px;text-align:center;}
+  .savings-banner .savings-amount{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;color:var(--gold);letter-spacing:-.04em;}
+  .savings-banner .savings-label{font-size:.82rem;color:rgba(245,242,235,.5);margin-top:4px;}
+
+  /* BENEFITS */
+  .benefits-section{padding:120px 48px;background:linear-gradient(180deg,var(--paper) 0%,var(--cream) 100%);}
+  .benefits-inner{max-width:1280px;margin:0 auto;}
+  .benefits-grid{margin-top:72px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+  .benefit-card{background:var(--cream);border:1px solid var(--border);border-radius:20px;padding:32px;transition:background .3s,border-color .3s,transform .3s,box-shadow .3s;cursor:none;}
+  .benefit-card:hover{background:rgba(201,168,76,.04);border-color:rgba(201,168,76,.4);transform:translateY(-4px);box-shadow:var(--shadow);}
+  .benefit-icon{font-size:2.4rem;margin-bottom:16px;display:block;}
+  .benefit-title{font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:700;color:var(--ink);margin-bottom:10px;letter-spacing:-.02em;}
+  .benefit-desc{font-size:.875rem;color:var(--muted);line-height:1.65;font-weight:300;}
+  .benefit-highlight{display:inline-block;background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.25);color:var(--gold-dim);font-size:.72rem;font-weight:600;padding:3px 10px;border-radius:100px;margin-top:12px;letter-spacing:.04em;}
+
+  /* USE CASES */
+  .use-cases-section{background:var(--ink);padding:120px 48px;}
+  .use-cases-inner{max-width:1280px;margin:0 auto;}
+  .use-cases-section .section-eyebrow{color:rgba(201,168,76,.7);}
+  .use-cases-section .section-eyebrow::before{background:var(--gold);}
+  .use-cases-section .section-title{color:var(--paper);}
+  .use-cases-section .section-subtitle{color:rgba(245,242,235,.5);}
+  .cases-grid{margin-top:72px;display:grid;grid-template-columns:repeat(2,1fr);gap:20px;}
+  .case-card{background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.15);border-radius:20px;padding:28px 32px;display:flex;gap:20px;transition:background .3s,border-color .3s,transform .3s;cursor:none;}
+  .case-card:hover{background:rgba(201,168,76,.07);border-color:rgba(201,168,76,.35);transform:translateY(-3px);}
+  .case-emoji{font-size:2.2rem;flex-shrink:0;line-height:1;margin-top:2px;}
+  .case-title{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;color:var(--paper);margin-bottom:8px;letter-spacing:-.02em;}
+  .case-desc{font-size:.875rem;color:rgba(245,242,235,.5);line-height:1.6;font-weight:300;}
+
+  /* PRICING */
+  .pricing-wrap{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:72px;align-items:start;}
+  .pricing-card{background:var(--cream);border:1px solid var(--border);border-radius:28px;padding:48px;position:relative;overflow:hidden;}
+  .pricing-card.featured{background:var(--ink);border-color:rgba(201,168,76,.3);}
+  .pricing-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+  .pricing-label{font-size:.75rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:16px;}
+  .pricing-card.featured .pricing-label{color:var(--gold);}
+  .pricing-fee{font-family:'Syne',sans-serif;font-size:4.5rem;font-weight:800;letter-spacing:-.06em;line-height:1;margin-bottom:8px;color:var(--ink);}
+  .pricing-fee span{font-size:1.8rem;}
+  .pricing-card.featured .pricing-fee{color:var(--paper);}
+  .pricing-note{font-size:.85rem;color:var(--muted);margin-bottom:32px;font-weight:300;}
+  .pricing-card.featured .pricing-note{color:rgba(245,242,235,.5);}
+  .pricing-list{list-style:none;display:flex;flex-direction:column;gap:12px;}
+  .pricing-list li{display:flex;align-items:flex-start;gap:10px;font-size:.9rem;color:var(--muted);font-weight:300;line-height:1.4;}
+  .pricing-card.featured .pricing-list li{color:rgba(245,242,235,.65);}
+  .check-icon{width:20px;height:20px;background:rgba(34,197,94,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#22C55E;font-size:11px;flex-shrink:0;margin-top:1px;}
+  .vs-banks{background:rgba(201,168,76,.06);border:1px solid var(--border);border-radius:20px;padding:32px;margin-top:28px;}
+  .vs-title{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:20px;}
+  .vs-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);font-size:.9rem;}
+  .vs-row:last-child{border-bottom:none;}
+  .vs-name{color:var(--muted);font-weight:300;}.vs-rate{font-weight:600;font-family:'Syne',sans-serif;}
+  .vs-rate.winner{color:var(--gold-dim);}.vs-rate.loser{color:#EF4444;}
+  .vs-tag{font-size:.7rem;padding:2px 8px;border-radius:100px;font-weight:600;}
+  .vs-tag.green{background:rgba(34,197,94,.1);color:#16A34A;}.vs-tag.red{background:rgba(239,68,68,.1);color:#DC2626;}
+
+  /* FORM */
+  .form-section{padding:120px 48px;background:linear-gradient(180deg,var(--cream) 0%,var(--paper) 100%);}
+  .form-inner{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;}
+  .form-card{background:var(--cream);border:1px solid var(--border);border-radius:28px;padding:44px;box-shadow:var(--shadow);position:relative;overflow:hidden;}
+  .form-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+  .form-title{font-family:'Syne',sans-serif;font-size:1.55rem;font-weight:800;letter-spacing:-.04em;color:var(--ink);margin-bottom:6px;}
+  .form-subtitle{font-size:.88rem;color:var(--muted);font-weight:300;margin-bottom:28px;}
+  .form-divider{font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-dim);margin:24px 0 14px;padding-bottom:8px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+  .form-divider::before{content:'';width:18px;height:1.5px;background:var(--gold);}
+  .form-group{margin-bottom:16px;}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .form-label{display:block;font-size:.78rem;font-weight:500;color:var(--ink);margin-bottom:7px;letter-spacing:.01em;}
+  .form-input,.form-select,.form-textarea{width:100%;background:rgba(255,255,255,.85);border:1.5px solid rgba(201,168,76,.2);border-radius:12px;padding:12px 14px;font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--ink);outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none;appearance:none;}
+  .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--gold);box-shadow:0 0 0 4px rgba(201,168,76,.1);}
+  .form-input::placeholder,.form-textarea::placeholder{color:rgba(107,101,88,.45);}
+  .form-textarea{resize:vertical;min-height:80px;line-height:1.5;}
+  .form-select{background-image:url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%238B6E2A' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;cursor:pointer;}
+  .amount-wrap{position:relative;}
+  .amount-prefix{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-weight:600;color:var(--gold-dim);font-size:.9rem;pointer-events:none;}
+  .amount-wrap .form-input{padding-left:50px;}
+  .fee-preview{background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.2);border-radius:12px;padding:14px;margin-bottom:16px;display:none;}
+  .fee-preview.visible{display:block;}
+  .fp-row{display:flex;justify-content:space-between;font-size:.84rem;padding:3px 0;color:var(--muted);}
+  .fp-row.total{border-top:1px solid var(--border);margin-top:8px;padding-top:9px;font-weight:600;color:var(--ink);font-size:.88rem;}
+  .submit-btn{width:100%;background:linear-gradient(135deg,var(--ink) 0%,#1a1a2e 100%);color:var(--paper);border:none;border-radius:14px;padding:17px;font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;cursor:none;letter-spacing:.02em;transition:transform .2s,box-shadow .2s;box-shadow:0 6px 24px rgba(10,10,15,.2);display:flex;align-items:center;justify-content:center;gap:10px;margin-top:10px;}
+  .submit-btn:hover{transform:translateY(-2px);box-shadow:0 12px 36px rgba(10,10,15,.3);}
+  .submit-btn:disabled{opacity:.65;transform:none;}
+  .form-note{text-align:center;margin-top:12px;font-size:.73rem;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:6px;}
+
+  /* WHATSAPP CTA */
+  .whatsapp-section{padding:80px 48px 120px;}
+  .whatsapp-cta{background:var(--ink);border-radius:32px;padding:80px;display:grid;grid-template-columns:1fr auto;gap:60px;align-items:center;position:relative;overflow:hidden;max-width:1280px;margin:0 auto;}
+  .whatsapp-cta::before{content:'';position:absolute;top:-100px;right:200px;width:400px;height:400px;background:radial-gradient(circle,rgba(37,211,102,.08) 0%,transparent 70%);border-radius:50%;pointer-events:none;}
+  .whatsapp-cta-title{font-family:'Syne',sans-serif;font-size:clamp(2rem,3vw,3rem);font-weight:800;color:var(--paper);letter-spacing:-.04em;line-height:1.1;margin-bottom:16px;}
+  .whatsapp-cta-sub{font-size:1rem;color:rgba(245,242,235,.5);font-weight:300;line-height:1.6;max-width:460px;}
+  .whatsapp-big-btn{background:#25D366;color:#fff;padding:20px 36px;border-radius:18px;font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;text-decoration:none;border:none;cursor:none;display:flex;align-items:center;gap:12px;transition:transform .25s,box-shadow .25s;box-shadow:0 8px 40px rgba(37,211,102,.3);white-space:nowrap;}
+  .whatsapp-big-btn:hover{transform:translateY(-4px) scale(1.02);box-shadow:0 20px 60px rgba(37,211,102,.4);}
+
+  /* FOOTER */
+  footer{background:var(--ink);border-top:1px solid rgba(245,242,235,.06);padding:60px 48px 40px;}
+  .footer-inner{max-width:1280px;margin:0 auto;}
+  .footer-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:48px;gap:40px;}
+  .footer-brand{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:var(--paper);letter-spacing:-.03em;margin-bottom:10px;display:flex;align-items:center;gap:10px;}
+  .footer-tagline{font-size:.85rem;color:rgba(245,242,235,.4);font-weight:300;max-width:220px;line-height:1.5;}
+  .footer-links{display:flex;gap:64px;}
+  .footer-col h4{font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:rgba(245,242,235,.4);margin-bottom:18px;}
+  .footer-col ul{list-style:none;display:flex;flex-direction:column;gap:10px;}
+  .footer-col a{font-size:.875rem;color:rgba(245,242,235,.6);text-decoration:none;font-weight:300;transition:color .2s;}
+  .footer-col a:hover{color:var(--gold);}
+  .footer-bottom{border-top:1px solid rgba(245,242,235,.06);padding-top:28px;display:flex;justify-content:space-between;align-items:center;}
+  .footer-copy{font-size:.8rem;color:rgba(245,242,235,.25);font-weight:300;}
+  .footer-legal{display:flex;gap:24px;}
+  .footer-legal a{font-size:.8rem;color:rgba(245,242,235,.25);text-decoration:none;transition:color .2s;}
+  .footer-legal a:hover{color:rgba(245,242,235,.5);}
+
+  /* TOAST */
+  .toast{position:fixed;bottom:32px;right:32px;background:var(--ink);color:var(--paper);border-radius:16px;padding:16px 24px;font-size:.88rem;font-weight:500;box-shadow:0 12px 40px rgba(10,10,15,.3);z-index:9990;transform:translateY(100px);opacity:0;transition:transform .4s,opacity .4s;display:flex;align-items:center;gap:10px;max-width:340px;border:1px solid rgba(201,168,76,.2);}
+  .toast.show{transform:translateY(0);opacity:1;}
+  .toast.success{border-color:rgba(34,197,94,.4);}.toast.error{border-color:rgba(239,68,68,.4);}
+
+  /* REVEAL */
+  .reveal{opacity:0;transform:translateY(32px);transition:opacity .7s,transform .7s;}
+  .reveal.visible{opacity:1;transform:translateY(0);}
+  .reveal-delay-1{transition-delay:.1s;}.reveal-delay-2{transition-delay:.2s;}.reveal-delay-3{transition-delay:.3s;}.reveal-delay-4{transition-delay:.4s;}
+
+  @media(max-width:900px){
+    nav{padding:16px 24px;}.nav-links{display:none;}
+    .hero{grid-template-columns:1fr;padding:120px 24px 60px;}.hero-card-wrap{order:-1;}.float-badge{display:none;}
+    .stats-outer{padding:40px 24px 0;}.stats-section{grid-template-columns:1fr 1fr;}
+    .section{padding:80px 24px;}.steps-grid{grid-template-columns:1fr;}.benefits-grid{grid-template-columns:1fr;}
+    .cases-grid{grid-template-columns:1fr;}.pricing-wrap{grid-template-columns:1fr;}
+    .cost-grid{grid-template-columns:1fr;}.form-inner{grid-template-columns:1fr;}.form-row{grid-template-columns:1fr;}
+    .whatsapp-cta{grid-template-columns:1fr;padding:48px 32px;}.whatsapp-section{padding:40px 24px 80px;}
+    footer{padding:48px 24px 32px;}.footer-top{flex-direction:column;}.footer-links{flex-direction:column;gap:32px;}
+    .footer-bottom{flex-direction:column;gap:16px;text-align:center;}
+    .cost-section{padding:80px 24px;}.benefits-section{padding:80px 24px;}.use-cases-section{padding:80px 24px;}
+    body{cursor:auto;}.cursor,.cursor-ring{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="toast" id="toast"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo"><div class="logo-icon">💸</div><span>mándalo</span></a>
+  <ul class="nav-links">
+    <li><a href="#como-funciona">¿Cómo funciona?</a></li>
+    <li><a href="#comparacion">vs. Bancos</a></li>
+    <li><a href="#beneficios">Beneficios</a></li>
+    <li><a href="#enviar" class="nav-cta">Enviar ahora</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section>
+  <div class="hero">
+    <div class="hero-content">
+      <div class="hero-badge"><div class="badge-dot"></div>Disponible en República Dominicana 🇩🇴</div>
+      <h1 class="hero-title">Paga con tarjeta.<br>Llega en<br><em>efectivo.</em></h1>
+      <p class="hero-subtitle">Convierte el crédito disponible en tu tarjeta en efectivo real. Sin ir al banco, sin intereses acumulados desde el día uno. Solo <strong>4.72% total</strong> — menos de la mitad de lo que cobra tu banco.</p>
+      <div class="hero-actions">
+        <a href="#enviar" class="btn-primary">Enviar ahora <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8H13M9 4L13 8L9 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        <a href="https://wa.me/18492675109?text=Hola%2C%20quiero%20enviar%20efectivo%20con%20M%C3%A1ndalo" class="btn-whatsapp" target="_blank">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Por WhatsApp
+        </a>
+      </div>
+      <div class="hero-trust">
+        <div class="trust-avatars"><div class="trust-avatar">MR</div><div class="trust-avatar">JP</div><div class="trust-avatar">AL</div><div class="trust-avatar">+</div></div>
+        <div class="trust-text"><strong>+200 personas</strong> ya mandaron su efectivo<br>con Mándalo este mes</div>
+      </div>
+    </div>
+
+    <div class="hero-card-wrap">
+      <div class="float-badge top-left">✅ Procesado en 24–48h laborables</div>
+      <div class="transaction-card">
+        <div class="card-header">
+          <span class="card-header-label">Calcula tu envío</span>
+          <span class="card-step">Sin costo oculto</span>
+        </div>
+        <div style="margin-bottom:4px;font-size:.76rem;color:var(--muted);">¿Cuánto efectivo quieres enviar?</div>
+        <div class="hero-amount-row">
+          <div class="currency-badge">RD$</div>
+          <input type="number" class="hero-amount-input" id="heroAmount" value="10000" min="1000" oninput="updateHeroCalc()">
+        </div>
+        <div class="hero-amount-hint">✏️ Escribe cualquier monto para ver las comisiones</div>
+        <div class="fee-breakdown">
+          <div class="fee-row"><span class="fee-row-label">Monto a enviar</span><span class="fee-row-value" id="h-base">RD$10,000</span></div>
+          <div class="fee-row"><span class="fee-row-label">Comisión (4%)</span><span class="fee-row-value" id="h-fee">RD$400</span></div>
+          <div class="fee-row"><span class="fee-row-label">ITBIS (18% de comisión)</span><span class="fee-row-value" id="h-itbis">RD$72</span></div>
+          <div class="fee-row total"><span class="fee-row-label">Total en tu tarjeta</span><span class="fee-row-value" id="h-total">RD$10,472</span></div>
+        </div>
+        <div class="recipient-row">
+          <div class="recipient-avatar">JR</div>
+          <div class="recipient-info"><div class="recipient-name">Juan Rodríguez</div><div class="recipient-bank">Banco Popular · Cuenta ••••4521</div></div>
+          <div class="recipient-check">✓</div>
+        </div>
+        <button class="send-btn-demo" id="demoBtn" onclick="demoClick()">💸 Confirmar y Pagar</button>
+        <div class="card-footer-note">🔒 Transacción segura · SSL encriptado</div>
+      </div>
+      <div class="float-badge bottom-right">🏦 vs 60% anual del banco</div>
+    </div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker-section">
+  <div class="ticker-track">
+    <div class="ticker-item"><strong>4.72%</strong> comisión total <div class="ticker-dot"></div></div>
+    <div class="ticker-item">Procesado en <strong>24–48h laborables</strong> <div class="ticker-dot"></div></div>
+    <div class="ticker-item"><strong>Sin intereses</strong> acumulados <div class="ticker-dot"></div></div>
+    <div class="ticker-item">Disponible por <strong>WhatsApp</strong> <div class="ticker-dot"></div></div>
+    <div class="ticker-item">Bancos cobran hasta <strong>60% anual</strong> <div class="ticker-dot"></div></div>
+    <div class="ticker-item">Acepta <strong>Visa · Mastercard · Amex</strong> <div class="ticker-dot"></div></div>
+    <div class="ticker-item">República Dominicana <strong>🇩🇴</strong> <div class="ticker-dot"></div></div>
+    <div class="ticker-item"><strong>4.72%</strong> comisión total <div class="ticker-dot"></div></div>
+    <div class="ticker-item">Procesado en <strong>24–48h laborables</strong> <div class="ticker-dot"></div></div>
+    <div class="ticker-item"><strong>Sin intereses</strong> acumulados <div class="ticker-dot"></div></div>
+    <div class="ticker-item">Disponible por <strong>WhatsApp</strong> <div class="ticker-dot"></div></div>
+    <div class="ticker-item">Bancos cobran hasta <strong>60% anual</strong> <div class="ticker-dot"></div></div>
+    <div class="ticker-item">Acepta <strong>Visa · Mastercard · Amex</strong> <div class="ticker-dot"></div></div>
+    <div class="ticker-item">República Dominicana <strong>🇩🇴</strong> <div class="ticker-dot"></div></div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-outer">
+  <div class="stats-section reveal">
+    <div class="stat-item"><div class="stat-number"><span>4.72</span>%</div><div class="stat-label">Comisión total<br>(incluye ITBIS)</div></div>
+    <div class="stat-item"><div class="stat-number"><span>0</span></div><div class="stat-label">Intereses acumulados<br>desde el día 1</div></div>
+    <div class="stat-item"><div class="stat-number"><span>60</span>%</div><div class="stat-label">Interés anual que<br>cobran los bancos</div></div>
+    <div class="stat-item"><div class="stat-number"><span>+20</span></div><div class="stat-label">Bancos del país<br>disponibles</div></div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="section" id="como-funciona">
+  <div class="section-eyebrow reveal">¿Cómo funciona?</div>
+  <h2 class="section-title reveal reveal-delay-1">Simple como<br>enviar un mensaje.</h2>
+  <p class="section-subtitle reveal reveal-delay-2">Sin formularios eternos ni visitas al banco. En tres pasos, el efectivo llega a donde lo necesitas.</p>
+  <div class="steps-grid">
+    <div class="step-card reveal"><div class="step-number">01</div><div class="step-icon">💳</div><div class="step-title">Ingresa el monto</div><p class="step-desc">Dinos cuánto efectivo necesitas enviar y a quién. Desde la web o directamente por WhatsApp. En minutos tenemos todo listo.</p></div>
+    <div class="step-card reveal reveal-delay-1"><div class="step-number">02</div><div class="step-icon">⚡</div><div class="step-title">Paga con tu tarjeta</div><p class="step-desc">Cargamos tu tarjeta de crédito por el monto más la comisión de 4.72% total. 100% seguro, encriptado y sin datos guardados.</p></div>
+    <div class="step-card reveal reveal-delay-2"><div class="step-number">03</div><div class="step-icon">🎯</div><div class="step-title">Procesamos la transferencia</div><p class="step-desc">Transferimos directamente a la cuenta bancaria del destinatario en <strong>24 a 48 horas laborables</strong>. Te confirmamos por WhatsApp cuando esté listo.</p></div>
+  </div>
+</section>
+
+<!-- COST COMPARISON -->
+<section class="cost-section" id="comparacion">
+  <div class="cost-inner">
+    <div class="section-eyebrow reveal">La letra pequeña que nadie te dice</div>
+    <h2 class="section-title reveal reveal-delay-1">Lo que realmente<br>te cobra el banco.</h2>
+    <p class="section-subtitle reveal reveal-delay-2">El 6.25% es solo el principio. Detrás hay tasas de interés anuales de hasta 60% que se acumulan mes a mes mientras no pagues el balance completo.</p>
+
+    <div class="cost-grid">
+      <!-- BANK CARD -->
+      <div class="cost-bank-card reveal">
+        <div style="margin-bottom:20px;">
+          <div class="card-bank-name"><div class="card-bank-logo">🏦</div>Avance de efectivo — Banco típico RD</div>
+          <div style="font-size:.78rem;color:rgba(245,242,235,.4);font-weight:300;margin-bottom:20px;">Ejemplo: RD$50,000 · Pagado en 2 meses</div>
+        </div>
+        <div class="cost-line">
+          <span class="cost-line-label">Comisión inmediata de avance (6.25%)</span>
+          <span class="cost-line-value">RD$3,125</span>
+        </div>
+        <div class="cost-line">
+          <span class="cost-line-label">Tasa de interés anual por financiamiento (Popular: 60% anual → 5% mensual)</span>
+          <span class="cost-line-value">RD$2,500/mes</span>
+        </div>
+        <div class="cost-line">
+          <span class="cost-line-label">Interés acumulado mes 1 (sobre el saldo completo)</span>
+          <span class="cost-line-value">RD$2,500</span>
+        </div>
+        <div class="cost-line">
+          <span class="cost-line-label">Interés acumulado mes 2 (si no pagaste todo)</span>
+          <span class="cost-line-value">RD$2,500+</span>
+        </div>
+        <div class="cost-line">
+          <span class="cost-line-label">Comisión por mora si no pagas mínimo a tiempo</span>
+          <span class="cost-line-value">RD$900</span>
+        </div>
+        <div class="cost-line">
+          <span class="cost-line-label">ITBIS sobre los intereses (18%)</span>
+          <span class="cost-line-value">RD$900+</span>
+        </div>
+        <div class="cost-total">
+          <span class="cost-total-label">Costo real en 2 meses</span>
+          <span class="cost-total-value">RD$9,025+</span>
+        </div>
+        <div style="margin-top:12px;font-size:.75rem;color:rgba(245,242,235,.3);line-height:1.5;">* Fuente: Tarifarios oficiales Banco Popular 2024 (tasa 60% anual) y Banreservas (35–45% anual). Los intereses se calculan sobre el saldo insoluto desde el día 1 del avance.</div>
+      </div>
+
+      <!-- MANDALO CARD -->
+      <div class="cost-mandalo-card reveal reveal-delay-1">
+        <div>
+          <div class="card-bank-name"><div class="card-bank-logo">💸</div>Mándalo</div>
+          <div style="font-size:.78rem;color:rgba(245,242,235,.4);font-weight:300;margin-bottom:20px;">Mismo ejemplo: RD$50,000</div>
+          <div class="mandalo-big-rate"><span>4.72</span>%</div>
+          <div class="mandalo-rate-note">Comisión total única. Eso es todo. Sin intereses.</div>
+          <div class="mandalo-perks">
+            <div class="mandalo-perk"><span class="perk-check">✓</span>Comisión fija de 4% + ITBIS</div>
+            <div class="mandalo-perk"><span class="perk-check">✓</span>Cero intereses acumulados, nunca</div>
+            <div class="mandalo-perk"><span class="perk-check">✓</span>Sin comisión por mora</div>
+            <div class="mandalo-perk"><span class="perk-check">✓</span>Sin cargos por financiamiento</div>
+            <div class="mandalo-perk"><span class="perk-check">✓</span>Lo que calculas es lo que pagas</div>
+          </div>
+        </div>
+        <div class="savings-banner">
+          <div class="savings-amount">RD$6,645</div>
+          <div class="savings-label">Lo que ahorras con Mándalo vs. avance bancario en este ejemplo</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SMALL PRINT CALLOUT -->
+    <div style="margin-top:40px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2);border-radius:20px;padding:32px;max-width:100%;" class="reveal">
+      <div style="font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;color:rgba(245,242,235,.7);text-transform:uppercase;letter-spacing:.08em;margin-bottom:16px;">⚠️ Lo que está en la letra pequeña de los bancos dominicanos</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+        <div style="font-size:.82rem;color:rgba(245,242,235,.45);line-height:1.6;"><strong style="color:rgba(245,242,235,.7);">Banco Popular</strong><br>Tasa de interés anual: <span style="color:#EF4444;font-weight:600;">60%</span> sobre el saldo del avance. Desde el día 1, sin período de gracia.</div>
+        <div style="font-size:.82rem;color:rgba(245,242,235,.45);line-height:1.6;"><strong style="color:rgba(245,242,235,.7);">Banreservas</strong><br>Tasas entre <span style="color:#EF4444;font-weight:600;">35% y 45%</span> anual. Transferencias vía apps móviles clasificadas como avance de efectivo.</div>
+        <div style="font-size:.82rem;color:rgba(245,242,235,.45);line-height:1.6;"><strong style="color:rgba(245,242,235,.7);">Scotiabank / Otros</strong><br>Transferencias por apps móviles = avance de efectivo. 6.25% + interés + ITBIS sobre intereses. Cargos desde el día 1.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BENEFITS -->
+<section class="benefits-section" id="beneficios">
+  <div class="benefits-inner">
+    <div class="section-eyebrow reveal">¿Por qué Mándalo?</div>
+    <h2 class="section-title reveal reveal-delay-1">La forma más inteligente<br>de mover dinero en RD.</h2>
+    <p class="section-subtitle reveal reveal-delay-2">No es solo una transferencia — es tener el control total de tu dinero, cuando lo necesitas, como lo necesitas.</p>
+    <div class="benefits-grid">
+      <div class="benefit-card reveal">
+        <span class="benefit-icon">💰</span>
+        <div class="benefit-title">Ahorra miles vs. tu banco</div>
+        <p class="benefit-desc">Con un avance bancario de RD$50,000 puedes terminar pagando RD$9,000+ en comisiones e intereses en solo 2 meses. Con Mándalo pagas RD$2,360 y se acabó. Una sola vez, para siempre.</p>
+        <span class="benefit-highlight">RD$6,645 ahorrados en ese ejemplo</span>
+      </div>
+      <div class="benefit-card reveal reveal-delay-1">
+        <span class="benefit-icon">🚫</span>
+        <div class="benefit-title">Cero intereses — en serio</div>
+        <p class="benefit-desc">Los bancos cobran tasas de 35% a 60% anual sobre el avance desde el día que lo usas. Eso es 2.9% a 5% cada mes. Con Mándalo el costo es plano: lo que ves es exactamente lo que pagas.</p>
+        <span class="benefit-highlight">Sin interés diario · Sin sorpresas</span>
+      </div>
+      <div class="benefit-card reveal reveal-delay-2">
+        <span class="benefit-icon">🔁</span>
+        <div class="benefit-title">Envíos automáticos configurados</div>
+        <p class="benefit-desc">¿Tienes pagos recurrentes? Configura envíos automáticos a tus destinatarios frecuentes — tu arrendador, tu empleado, tu familiar. No vuelves a hacer el proceso desde cero cada vez.</p>
+        <span class="benefit-highlight">Pagos recurrentes sin fricción</span>
+      </div>
+      <div class="benefit-card reveal">
+        <span class="benefit-icon">🪪</span>
+        <div class="benefit-title">Envíate dinero a ti mismo</div>
+        <p class="benefit-desc">No tienes que enviarlo a otra persona. Puedes usar Mándalo para convertir tu crédito disponible en efectivo en tu propia cuenta bancaria — para tener liquidez cuando la necesites.</p>
+        <span class="benefit-highlight">Tu crédito → tu cuenta → tu efectivo</span>
+      </div>
+      <div class="benefit-card reveal reveal-delay-1">
+        <span class="benefit-icon">📱</span>
+        <div class="benefit-title">Todo desde WhatsApp</div>
+        <p class="benefit-desc">No necesitas apps ni cuentas. Escríbenos por WhatsApp y un agente te asiste personalmente. En RD, el negocio se hace por WhatsApp — nosotros también.</p>
+        <span class="benefit-highlight">Sin apps · Sin cuentas · Sin filas</span>
+      </div>
+      <div class="benefit-card reveal reveal-delay-2">
+        <span class="benefit-icon">🏦</span>
+        <div class="benefit-title">Cualquier banco del país</div>
+        <p class="benefit-desc">Enviamos a Banreservas, Popular, BHD, Scotiabank, APAP, Cibao y todos los bancos de la República Dominicana. Si tiene cuenta bancaria dominicana, llega.</p>
+        <span class="benefit-highlight">+20 bancos disponibles</span>
+      </div>
+      <div class="benefit-card reveal">
+        <span class="benefit-icon">💳</span>
+        <div class="benefit-title">Convierte tu límite en liquidez</div>
+        <p class="benefit-desc">Tienes crédito disponible pero el efectivo no alcanza. Mándalo convierte ese crédito en efectivo real para pagar lo que solo acepta cash — sin un adelanto bancario que te sigue cobrando.</p>
+        <span class="benefit-highlight">Tu crédito, tu control</span>
+      </div>
+      <div class="benefit-card reveal reveal-delay-1">
+        <span class="benefit-icon">🔒</span>
+        <div class="benefit-title">Seguro y verificado</div>
+        <p class="benefit-desc">Cada transacción requiere verificación de identidad (KYC). Operamos con estándares AML de la Superintendencia de Bancos de la República Dominicana. Tu dinero está seguro.</p>
+        <span class="benefit-highlight">Cumplimiento AML/KYC</span>
+      </div>
+      <div class="benefit-card reveal reveal-delay-2">
+        <span class="benefit-icon">📊</span>
+        <div class="benefit-title">Confirmación total</div>
+        <p class="benefit-desc">Recibes confirmación por WhatsApp cuando la transferencia es procesada. Siempre sabes qué pasó con tu dinero. Total transparencia, comprobante digital en tu mano.</p>
+        <span class="benefit-highlight">Comprobante digital inmediato</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- USE CASES -->
+<section class="use-cases-section" id="usos">
+  <div class="use-cases-inner">
+    <div class="section-eyebrow reveal">Casos de uso</div>
+    <h2 class="section-title reveal reveal-delay-1">Muchas razones<br>para usar Mándalo.</h2>
+    <p class="section-subtitle reveal reveal-delay-2">Donde el efectivo manda, Mándalo te resuelve.</p>
+    <div class="cases-grid">
+      <div class="case-card reveal"><div class="case-emoji">🏠</div><div><div class="case-title">Renta y arrendamientos</div><p class="case-desc">Tu casero solo acepta efectivo. Con Mándalo usas tu tarjeta y el dinero llega directo a su cuenta bancaria.</p></div></div>
+      <div class="case-card reveal reveal-delay-1"><div class="case-emoji">🪪</div><div><div class="case-title">Enviarte dinero a ti mismo</div><p class="case-desc">¿Necesitas liquidez? Convierte tu crédito disponible en efectivo directo a tu propia cuenta. Sin trámites, sin banco.</p></div></div>
+      <div class="case-card reveal reveal-delay-2"><div class="case-emoji">🔧</div><div><div class="case-title">Servicios y contratistas</div><p class="case-desc">Plomero, electricista, constructor. Págales en efectivo sin buscar ATM ni ir al banco.</p></div></div>
+      <div class="case-card reveal reveal-delay-3"><div class="case-emoji">🏥</div><div><div class="case-title">Emergencias médicas</div><p class="case-desc">Clínicas que solo aceptan cash. No pierdas tiempo buscando efectivo en momentos críticos.</p></div></div>
+      <div class="case-card reveal"><div class="case-emoji">🎓</div><div><div class="case-title">Colegios y universidades</div><p class="case-desc">Cuotas escolares que requieren pago directo. Lo manejamos sin complicaciones ni filas.</p></div></div>
+      <div class="case-card reveal reveal-delay-1"><div class="case-emoji">👨‍👩‍👧</div><div><div class="case-title">Envíos a familia</div><p class="case-desc">Manda efectivo a un familiar en otra provincia sin agentes ni filas en el banco.</p></div></div>
+      <div class="case-card reveal reveal-delay-2"><div class="case-emoji">🔁</div><div><div class="case-title">Pagos recurrentes automáticos</div><p class="case-desc">Configura envíos automáticos a tus destinatarios frecuentes. Ideal para rentas, nómina, o soporte mensual a familia.</p></div></div>
+      <div class="case-card reveal reveal-delay-3"><div class="case-emoji">🛒</div><div><div class="case-title">Suplidores y mercados</div><p class="case-desc">Negocios que trabajan solo en cash. Tu crédito llega donde lo necesitas, siempre.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="section" id="precios">
+  <div class="section-eyebrow reveal">Precios</div>
+  <h2 class="section-title reveal reveal-delay-1">Transparente.<br>Sin sorpresas.</h2>
+  <p class="section-subtitle reveal reveal-delay-2">Una sola comisión, todo incluido. Sin intereses, sin cargos ocultos, sin letra pequeña.</p>
+  <div class="pricing-wrap">
+    <div class="pricing-card featured reveal">
+      <div class="pricing-label">Mándalo</div>
+      <div class="pricing-fee"><span>4</span>%</div>
+      <div class="pricing-note">+ 18% ITBIS sobre comisión = <strong style="color:var(--gold)">4.72% total efectivo</strong></div>
+      <ul class="pricing-list">
+        <li><span class="check-icon">✓</span>Sin intereses desde el día 1, nunca</li>
+        <li><span class="check-icon">✓</span>Confirmación por WhatsApp</li>
+        <li><span class="check-icon">✓</span>Procesado en 24–48 horas laborables</li>
+        <li><span class="check-icon">✓</span>Visa, Mastercard y Amex</li>
+        <li><span class="check-icon">✓</span>Transferencia a cualquier banco RD</li>
+        <li><span class="check-icon">✓</span>Envíos automáticos a favoritos</li>
+        <li><span class="check-icon">✓</span>Puedes enviarte a ti mismo</li>
+        <li><span class="check-icon">✓</span>Soporte 7 días a la semana</li>
+      </ul>
+    </div>
+    <div>
+      <div class="pricing-card reveal reveal-delay-1">
+        <div class="pricing-label">Ejemplo — RD$50,000</div>
+        <div class="pricing-fee" style="color:var(--gold-dim)"><span style="font-size:1.8rem">RD$</span>52,360</div>
+        <div class="pricing-note">Total en tu tarjeta para enviar RD$50,000</div>
+        <ul class="pricing-list">
+          <li><span class="check-icon">✓</span>Efectivo enviado: <strong style="color:var(--ink)">RD$50,000</strong></li>
+          <li><span class="check-icon">✓</span>Comisión 4%: <strong style="color:var(--ink)">RD$2,000</strong></li>
+          <li><span class="check-icon">✓</span>ITBIS (18%): <strong style="color:var(--ink)">RD$360</strong></li>
+          <li><span class="check-icon" style="background:rgba(34,197,94,.15)">✓</span>Ahorras vs banco: <strong style="color:#16A34A">RD$6,645+</strong></li>
+        </ul>
+      </div>
+      <div class="vs-banks reveal reveal-delay-2">
+        <div class="vs-title">Comparación real de costos</div>
+        <div class="vs-row"><span class="vs-name">🟢 Mándalo (total fijo)</span><span class="vs-rate winner">4.72% — una vez</span><span class="vs-tag green">Mejor precio</span></div>
+        <div class="vs-row"><span class="vs-name">🔴 Banco Popular</span><span class="vs-rate loser">6.25% + 60% anual</span><span class="vs-tag red">Muy caro</span></div>
+        <div class="vs-row"><span class="vs-name">🔴 Banreservas</span><span class="vs-rate loser">6.25% + 35–45% anual</span><span class="vs-tag red">Muy caro</span></div>
+        <div class="vs-row"><span class="vs-name">🔴 Scotiabank / Otros</span><span class="vs-rate loser">6.25% + interés diario</span><span class="vs-tag red">Muy caro</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FORM -->
+<section class="form-section" id="enviar">
+  <div class="form-inner">
+    <div>
+      <div class="section-eyebrow reveal">Envía ahora</div>
+      <h2 class="section-title reveal reveal-delay-1">¿Listo para<br>mandar tu efectivo?</h2>
+      <p class="section-subtitle reveal reveal-delay-2">Completa el formulario y te contactamos por WhatsApp para procesar tu transacción en las próximas 24–48 horas laborables.</p>
+      <div style="margin-top:36px;display:flex;flex-direction:column;gap:18px;">
+        <div style="display:flex;align-items:center;gap:12px;" class="reveal reveal-delay-1">
+          <div style="width:44px;height:44px;background:rgba(201,168,76,.1);border:1px solid var(--border);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">⚡</div>
+          <div><div style="font-weight:500;font-size:.9rem;color:var(--ink);">Procesado en 24–48h laborables</div><div style="font-size:.8rem;color:var(--muted);font-weight:300;">Te confirmamos cada paso por WhatsApp</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;" class="reveal reveal-delay-2">
+          <div style="width:44px;height:44px;background:rgba(201,168,76,.1);border:1px solid var(--border);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🔒</div>
+          <div><div style="font-weight:500;font-size:.9rem;color:var(--ink);">Datos protegidos</div><div style="font-size:.8rem;color:var(--muted);font-weight:300;">Encriptación SSL y verificación KYC en cada operación</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;" class="reveal reveal-delay-3">
+          <div style="width:44px;height:44px;background:rgba(201,168,76,.1);border:1px solid var(--border);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🔁</div>
+          <div><div style="font-weight:500;font-size:.9rem;color:var(--ink);">Guarda tus destinatarios favoritos</div><div style="font-size:.8rem;color:var(--muted);font-weight:300;">Configura envíos automáticos a personas frecuentes</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;" class="reveal reveal-delay-4">
+          <div style="width:44px;height:44px;background:rgba(201,168,76,.1);border:1px solid var(--border);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">📱</div>
+          <div><div style="font-weight:500;font-size:.9rem;color:var(--ink);">O escríbenos por WhatsApp</div><div style="font-size:.8rem;color:var(--muted);font-weight:300;">+1 (849) 267-5109 — atención directa</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-card reveal reveal-delay-1">
+      <div class="form-title">Nueva transferencia</div>
+      <div class="form-subtitle">Tu crédito → efectivo · Procesado en 24–48h laborables</div>
+
+      <div class="form-divider">Tus datos</div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Nombre completo *</label><input type="text" class="form-input" id="f-name" placeholder="María Rodríguez" required></div>
+        <div class="form-group"><label class="form-label">Cédula / Pasaporte *</label><input type="text" class="form-input" id="f-cedula" placeholder="000-0000000-0" required></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">WhatsApp *</label><input type="tel" class="form-input" id="f-whatsapp" placeholder="+1 (849) 000-0000" required></div>
+        <div class="form-group"><label class="form-label">Correo electrónico</label><input type="email" class="form-input" id="f-email" placeholder="tu@correo.com"></div>
+      </div>
+
+      <div class="form-divider">Monto a enviar</div>
+      <div class="form-group">
+        <label class="form-label">Monto en efectivo (RD$) *</label>
+        <div class="amount-wrap">
+          <span class="amount-prefix">RD$</span>
+          <input type="number" class="form-input" id="f-amount" placeholder="10,000" min="1000" oninput="calcFormFee(this.value)" required>
+        </div>
+      </div>
+      <div class="fee-preview" id="formFeePreview">
+        <div class="fp-row"><span>Efectivo a enviar</span><span id="fp-base">—</span></div>
+        <div class="fp-row"><span>Comisión (4%)</span><span id="fp-fee">—</span></div>
+        <div class="fp-row"><span>ITBIS (18% de comisión)</span><span id="fp-itbis">—</span></div>
+        <div class="fp-row total"><span>💳 Total en tu tarjeta</span><span id="fp-total">—</span></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Descripción / motivo de la transferencia</label>
+        <textarea class="form-textarea" id="f-description" placeholder="Ej: Pago de renta de enero, envío a mamá, pago contratista..."></textarea>
+      </div>
+
+      <div class="form-divider">Datos del destinatario</div>
+      <div style="background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.15);border-radius:12px;padding:12px 14px;margin-bottom:16px;font-size:.78rem;color:var(--muted);">
+        💡 <strong style="color:var(--ink);">Puedes enviarte a ti mismo</strong> — pon tus propios datos como destinatario para recibir el efectivo en tu cuenta.
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Nombre completo *</label><input type="text" class="form-input" id="f-dest-name" placeholder="Juan Pérez" required></div>
+        <div class="form-group"><label class="form-label">Cédula / Pasaporte *</label><input type="text" class="form-input" id="f-dest-cedula" placeholder="000-0000000-0" required></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Banco del destinatario *</label>
+        <select class="form-select" id="f-dest-bank" required>
+          <option value="">— Selecciona el banco —</option>
+          <optgroup label="Bancos Múltiples">
+            <option>Banco de Reservas (Banreservas)</option>
+            <option>Banco Popular Dominicano</option>
+            <option>Banco BHD</option>
+            <option>Scotiabank República Dominicana</option>
+            <option>Banco Santa Cruz</option>
+            <option>Banco López de Haro</option>
+            <option>Citibank República Dominicana</option>
+            <option>Banco Caribe</option>
+            <option>Banco Vimenca</option>
+            <option>Banco Lafise</option>
+            <option>Banco Promerica</option>
+            <option>Banco Ademi</option>
+            <option>Banco Bellbank</option>
+            <option>Banco BDI</option>
+            <option>Banco JMMB</option>
+          </optgroup>
+          <optgroup label="Asociaciones de Ahorros y Préstamos">
+            <option>Asociación Popular de Ahorros y Préstamos (APAP)</option>
+            <option>Asociación Cibao de Ahorros y Préstamos</option>
+            <option>La Nacional de Ahorros y Préstamos</option>
+            <option>Asociación Duarte de Ahorros y Préstamos</option>
+            <option>Asociación Peravia de Ahorros y Préstamos</option>
+            <option>Asociación Mocana de Ahorros y Préstamos</option>
+            <option>Banco Nacional de Fomento de la Vivienda (BNV)</option>
+          </optgroup>
+          <optgroup label="Otros">
+            <option>Motor Crédito</option>
+            <option>Cooperativa / Otro</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Número de cuenta *</label><input type="text" class="form-input" id="f-dest-account" placeholder="Ej. 2100123456789" required></div>
+        <div class="form-group">
+          <label class="form-label">Tipo de cuenta</label>
+          <select class="form-select" id="f-dest-acct-type">
+            <option value="">— Tipo —</option>
+            <option>Cuenta Corriente</option>
+            <option>Cuenta de Ahorros</option>
+            <option>Cuenta Nómina</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="submit-btn" id="submitBtn" onclick="submitForm(event)">
+        💸 Solicitar transferencia
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8H13M9 4L13 8L9 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="form-note">🔒 Datos protegidos · KYC obligatorio · Procesado en 24–48h laborables</div>
+    </div>
+  </div>
+</section>
+
+<!-- WHATSAPP CTA -->
+<section class="whatsapp-section">
+  <div class="whatsapp-cta reveal">
+    <div>
+      <div style="font-size:2.5rem;margin-bottom:16px;">📱</div>
+      <h2 class="whatsapp-cta-title">¿Prefieres hacerlo<br>por WhatsApp?</h2>
+      <p class="whatsapp-cta-sub">Escríbenos al <strong style="color:rgba(255,255,255,.8);">+1 (849) 267-5109</strong> y un agente te asiste directamente. WhatsApp es nuestra forma favorita de trabajar — igual que la tuya.</p>
+    </div>
+    <a href="https://wa.me/18492675109?text=Hola%2C%20quiero%20enviar%20efectivo%20con%20M%C3%A1ndalo" class="whatsapp-big-btn" target="_blank">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Escribir al (849) 267-5109
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <div class="footer-brand"><div class="logo-icon">💸</div>mándalo</div>
+        <div class="footer-tagline">Tu crédito convertido en efectivo. Sin intereses, sin letra pequeña. República Dominicana.</div>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col"><h4>Servicio</h4><ul><li><a href="#como-funciona">¿Cómo funciona?</a></li><li><a href="#comparacion">vs. Bancos</a></li><li><a href="#beneficios">Beneficios</a></li><li><a href="#enviar">Enviar ahora</a></li></ul></div>
+        <div class="footer-col"><h4>Legal</h4><ul><li><a href="#">Términos y condiciones</a></li><li><a href="#">Política de privacidad</a></li><li><a href="#">Política AML/KYC</a></li><li><a href="#">Aviso legal</a></li></ul></div>
+        <div class="footer-col"><h4>Contacto</h4><ul><li><a href="https://wa.me/18492675109">WhatsApp (849) 267-5109</a></li><li><a href="mailto:hola@mandalo.do">hola@mandalo.do</a></li><li><a href="#">Instagram</a></li><li><a href="#">Santo Domingo, RD</a></li></ul></div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2025 Mándalo SRL · RNC 000-00000-0 · República Dominicana</div>
+      <div class="footer-legal"><a href="#">Términos</a><a href="#">Privacidad</a><a href="#">Cookies</a></div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  emailjs.init("YOUR_EMAILJS_PUBLIC_KEY");
+
+  // Cursor
+  const cur=document.getElementById('cursor'),ring=document.getElementById('cursorRing');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px';});
+  (function anim(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(anim);})();
+  document.querySelectorAll('a,button,input,select,textarea').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{cur.style.width='20px';cur.style.height='20px';ring.style.width='52px';ring.style.height='52px';});
+    el.addEventListener('mouseleave',()=>{cur.style.width='12px';cur.style.height='12px';ring.style.width='36px';ring.style.height='36px';});
+  });
+
+  function showToast(msg,type='success'){
+    const t=document.getElementById('toast');t.textContent=(type==='success'?'✅ ':'❌ ')+msg;
+    t.className='toast show '+type;setTimeout(()=>t.className='toast',5500);
+  }
+
+  function fmt(n){return 'RD$'+Math.round(n).toLocaleString('es-DO');}
+
+  function updateHeroCalc(){
+    const v=parseFloat(document.getElementById('heroAmount').value)||0;
+    const fee=v*.04,itbis=fee*.18,total=v+fee+itbis;
+    document.getElementById('h-base').textContent=v>0?fmt(v):'—';
+    document.getElementById('h-fee').textContent=v>0?fmt(fee):'—';
+    document.getElementById('h-itbis').textContent=v>0?fmt(itbis):'—';
+    document.getElementById('h-total').textContent=v>0?fmt(total):'—';
+  }
+  updateHeroCalc();
+
+  function demoClick(){
+    const b=document.getElementById('demoBtn');
+    b.textContent='✅ ¡Solicitud enviada!';b.style.background='#22C55E';
+    setTimeout(()=>{b.textContent='💸 Confirmar y Pagar';b.style.background='';},2500);
+  }
+
+  function calcFormFee(val){
+    const a=parseFloat(val),p=document.getElementById('formFeePreview');
+    if(!val||isNaN(a)||a<=0){p.classList.remove('visible');return;}
+    const fee=a*.04,itbis=fee*.18,total=a+fee+itbis;
+    document.getElementById('fp-base').textContent=fmt(a);
+    document.getElementById('fp-fee').textContent=fmt(fee);
+    document.getElementById('fp-itbis').textContent=fmt(itbis);
+    document.getElementById('fp-total').textContent=fmt(total);
+    p.classList.add('visible');
+  }
+
+  function submitForm(e){
+    e.preventDefault();
+    const g=id=>document.getElementById(id).value.trim();
+    const fields={
+      name:g('f-name'),cedula:g('f-cedula'),whatsapp:g('f-whatsapp'),email:g('f-email'),
+      amount:g('f-amount'),description:g('f-description'),
+      destName:g('f-dest-name'),destCedula:g('f-dest-cedula'),
+      destBank:g('f-dest-bank'),destAccount:g('f-dest-account'),destAcctType:g('f-dest-acct-type')
+    };
+    const req=['name','cedula','whatsapp','amount','destName','destCedula','destBank','destAccount'];
+    if(req.some(k=>!fields[k])){showToast('Completa todos los campos obligatorios (*)','error');return;}
+    const amt=parseFloat(fields.amount);
+    if(isNaN(amt)||amt<1000){showToast('El monto mínimo es RD$1,000','error');return;}
+    const fee=amt*.04,itbis=fee*.18,total=amt+fee+itbis;
+    const btn=document.getElementById('submitBtn');
+    btn.disabled=true;btn.innerHTML='⏳ Enviando solicitud...';
+
+    const msgBody=`
+NUEVA SOLICITUD DE TRANSFERENCIA — MÁNDALO
+==========================================
+
+DATOS DEL SOLICITANTE
+Nombre: ${fields.name}
+Cédula/Pasaporte: ${fields.cedula}
+WhatsApp: ${fields.whatsapp}
+Email: ${fields.email||'No proporcionado'}
+
+MONTO DE LA TRANSACCIÓN
+Monto a enviar: ${fmt(amt)}
+Comisión (4%): ${fmt(fee)}
+ITBIS (18% de comisión): ${fmt(itbis)}
+Total a cargar en tarjeta: ${fmt(total)}
+Descripción/Motivo: ${fields.description||'No especificado'}
+
+DATOS DEL DESTINATARIO
+Nombre: ${fields.destName}
+Cédula/Pasaporte: ${fields.destCedula}
+Banco: ${fields.destBank}
+Número de cuenta: ${fields.destAccount}
+Tipo de cuenta: ${fields.destAcctType||'No especificado'}
+
+Fecha/Hora: ${new Date().toLocaleString('es-DO',{timeZone:'America/Santo_Domingo'})}
+    `.trim();
+
+    emailjs.send('YOUR_SERVICE_ID','YOUR_TEMPLATE_ID',{
+      to_email:'anthonyyrivas@hotmail.com',
+      subject:`Nueva solicitud Mándalo — ${fmt(amt)} — ${fields.name}`,
+      from_name:fields.name,
+      reply_to:fields.email||fields.whatsapp,
+      message:msgBody
+    }).then(()=>{
+      btn.innerHTML='✅ ¡Solicitud enviada!';btn.style.background='linear-gradient(135deg,#22C55E,#16A34A)';
+      showToast('¡Listo! Te contactaremos por WhatsApp para confirmar tu transacción.');
+      setTimeout(()=>{btn.innerHTML='💸 Solicitar transferencia <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8H13M9 4L13 8L9 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';btn.style.background='';btn.disabled=false;},6000);
+    }).catch(()=>{
+      const sub=encodeURIComponent(`Nueva solicitud Mándalo — ${fmt(amt)} — ${fields.name}`);
+      const body=encodeURIComponent(msgBody);
+      window.location.href=`mailto:anthonyyrivas@hotmail.com?subject=${sub}&body=${body}`;
+      showToast('Abriendo tu correo como alternativa...','error');
+      btn.innerHTML='💸 Solicitar transferencia <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8H13M9 4L13 8L9 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      btn.disabled=false;
+    });
+  }
+
+  const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}});},{threshold:.1});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>
