@@ -1656,59 +1656,41 @@ Fecha/Hora: ${new Date().toLocaleString('es-DO',{timeZone:'America/Santo_Domingo
 
   function buildEmailLink(){
     const d=_orderData;
-    const sub=encodeURIComponent('[MVP] Orden '+d.orderId+' — USD $'+d.usd+' — '+d.name+(d.discountApplied?' 🎁 DESCUENTO':' '));
     const g=id=>(document.getElementById(id)||{value:''}).value.trim();
-    const body=encodeURIComponent(
-'NUEVA SOLICITUD DE TRANSFERENCIA — MÁNDALO MVP
-'+
-'===============================================
-'+
-'ID DE ORDEN: '+d.orderId+'
-'+
-'CÓDIGO DESCUENTO: '+(d.discountApplied?'FIRST100%OFF ✅ Comisión eliminada':'Ninguno')+'
-
-'+
-'DATOS DEL SOLICITANTE
-'+
-'Nombre: '+d.name+'
-'+
-'Cédula/Pasaporte: '+d.cedula+'
-'+
-'WhatsApp: '+d.whatsapp+'
-'+
-'Email: '+(g('f-email')||'No proporcionado')+'
-
-'+
-'MONTO DE LA TRANSACCIÓN
-'+
-'Efectivo a enviar: '+fmt(d.total)+'
-'+
-'Total en USD (PayPal): $'+d.usd+' USD
-'+
-'Tasa de cambio: ~'+USD_RATE+' RD$ por USD
-'+
-'Descuento: '+(d.discountApplied?'Comisión 0% (FIRST100%OFF)':'4% + ITBIS')+'
-'+
-'Descripción/Motivo: '+(d.description||'No especificado')+'
-
-'+
-'DATOS DEL DESTINATARIO
-'+
-'Nombre: '+d.destName+'
-'+
-'Cédula/Pasaporte: '+(g('f-dest-cedula')||'—')+'
-'+
-'Banco: '+d.destBank+'
-'+
-'Número de cuenta: '+d.destAccount+'
-'+
-'Tipo de cuenta: '+(g('f-dest-acct-type')||'No especificado')+'
-
-'+
-'Fecha/Hora: '+new Date().toLocaleString('es-DO',{timeZone:'America/Santo_Domingo'})
+    const subject=encodeURIComponent(
+      '[MVP] Orden '+d.orderId+' — USD $'+d.usd+' — '+d.name+(d.discountApplied?' DESCUENTO':'')
     );
+    const lines=[
+      'NUEVA SOLICITUD DE TRANSFERENCIA — MANDALO MVP',
+      '===============================================',
+      'ID DE ORDEN: '+d.orderId,
+      'CODIGO DESCUENTO: '+(d.discountApplied?'FIRST100%OFF - Comision eliminada':'Ninguno'),
+      '',
+      'DATOS DEL SOLICITANTE',
+      'Nombre: '+d.name,
+      'Cedula/Pasaporte: '+d.cedula,
+      'WhatsApp: '+d.whatsapp,
+      'Email: '+(g('f-email')||'No proporcionado'),
+      '',
+      'MONTO DE LA TRANSACCION',
+      'Efectivo a enviar: '+fmt(d.total),
+      'Total en USD (PayPal): $'+d.usd+' USD',
+      'Tasa de cambio: ~'+USD_RATE+' RD$ por USD',
+      'Descuento: '+(d.discountApplied?'Comision 0% (FIRST100%OFF)':'4% + ITBIS'),
+      'Descripcion/Motivo: '+(d.description||'No especificado'),
+      '',
+      'DATOS DEL DESTINATARIO',
+      'Nombre: '+d.destName,
+      'Cedula/Pasaporte: '+(g('f-dest-cedula')||'—'),
+      'Banco: '+d.destBank,
+      'Numero de cuenta: '+d.destAccount,
+      'Tipo de cuenta: '+(g('f-dest-acct-type')||'No especificado'),
+      '',
+      'Fecha/Hora: '+new Date().toLocaleString('es-DO',{timeZone:'America/Santo_Domingo'})
+    ];
+    const body=encodeURIComponent(lines.join('\n'));
     const emailLink=document.getElementById('emailBtn');
-    if(emailLink) emailLink.href='mailto:anthonyyrivas@hotmail.com?subject='+sub+'&body='+body;
+    if(emailLink) emailLink.href='mailto:anthonyyrivas@hotmail.com?subject='+subject+'&body='+body;
   }
 
   function sendEmail(e){
@@ -2066,12 +2048,14 @@ function launchConfetti(){
   for(let i=0;i<70;i++){
     const el=document.createElement('div');
     const rot='rotate('+Math.random()*360+'deg)';
-    el.style.cssText=`--r:${rot};position:fixed;top:${10+Math.random()*30}%;left:${Math.random()*100}%;
-      width:${7+Math.random()*9}px;height:${7+Math.random()*9}px;
-      background:${colors[Math.floor(Math.random()*colors.length)]};
-      border-radius:${Math.random()>.5?'50%':'3px'};
-      pointer-events:none;z-index:9999;
-      animation:confettiFall ${1.2+Math.random()*1.8}s ease-out forwards;`;
+    var top=(10+Math.random()*30).toFixed(1);
+    var left=(Math.random()*100).toFixed(1);
+    var w=(7+Math.random()*9).toFixed(1);
+    var h=(7+Math.random()*9).toFixed(1);
+    var bg=colors[Math.floor(Math.random()*colors.length)];
+    var br=Math.random()>.5?'50%':'3px';
+    var dur=(1.2+Math.random()*1.8).toFixed(2);
+    el.style.cssText='--r:'+rot+';position:fixed;top:'+top+'%;left:'+left+'%;width:'+w+'px;height:'+h+'px;background:'+bg+';border-radius:'+br+';pointer-events:none;z-index:9999;animation:confettiFall '+dur+'s ease-out forwards;';
     document.body.appendChild(el);
     setTimeout(()=>el.remove(),3500);
   }
