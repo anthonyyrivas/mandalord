@@ -429,31 +429,103 @@
 
     <div class="hero-card-wrap">
       <div class="float-badge top-left">✅ Procesado en 24–48h laborables</div>
-      <div class="transaction-card">
-        <div class="card-header">
+      <div class="transaction-card" style="padding:28px 28px 22px;">
+
+        <div class="card-header" style="margin-bottom:12px;">
           <span class="card-header-label">Calcula tu envío</span>
           <span class="card-step">Sin costo oculto</span>
         </div>
+
         <div style="margin-bottom:4px;font-size:.76rem;color:var(--muted);">¿Cuánto efectivo quieres enviar?</div>
         <div class="hero-amount-row">
           <div class="currency-badge">RD$</div>
           <input type="number" class="hero-amount-input" id="heroAmount" value="10000" min="1000" oninput="updateHeroCalc()">
         </div>
         <div class="hero-amount-hint">✏️ Escribe cualquier monto para ver las comisiones</div>
-        <div class="fee-breakdown">
+
+        <!-- FLOW ANIMATION -->
+        <style>
+          .flow-wrap{display:flex;align-items:center;justify-content:space-between;gap:4px;padding:2px 0;}
+          .flow-card{width:84px;height:54px;border-radius:10px;background:linear-gradient(135deg,#0d1117 0%,#1a1a3e 50%,#0f3460 100%);box-shadow:0 8px 24px rgba(10,10,15,.4),0 0 0 1px rgba(255,255,255,.07);position:relative;overflow:hidden;flex-shrink:0;}
+          .flow-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(201,168,76,.18) 0%,transparent 55%);pointer-events:none;}
+          .flow-chip{width:17px;height:13px;background:linear-gradient(135deg,#C9A84C,#E8C96A);border-radius:3px;position:absolute;top:9px;left:9px;}
+          .flow-num{position:absolute;bottom:8px;left:9px;font-family:monospace;font-size:.48rem;font-weight:700;color:rgba(255,255,255,.55);letter-spacing:.1em;}
+          .flow-logo{position:absolute;bottom:6px;right:8px;font-size:.9rem;}
+          .flow-shine{position:absolute;top:-20px;left:-20px;width:60px;height:60px;background:radial-gradient(circle,rgba(255,255,255,.15) 0%,transparent 70%);animation:fcShine 3s ease-in-out infinite;}
+          @keyframes fcShine{0%,100%{transform:translate(0,0)}50%{transform:translate(18px,16px)}}
+
+          .flow-arrow{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;}
+          .flow-line{height:2px;width:100%;background:linear-gradient(90deg,rgba(201,168,76,.2),var(--gold),rgba(201,168,76,.2));border-radius:2px;position:relative;overflow:visible;}
+          .flow-dot{width:7px;height:7px;background:var(--gold);border-radius:50%;position:absolute;top:-2.5px;animation:fDot 2.2s ease-in-out infinite;box-shadow:0 0 8px rgba(201,168,76,.9);}
+          @keyframes fDot{0%{left:0;opacity:0}12%{opacity:1}88%{opacity:1}100%{left:calc(100% - 7px);opacity:0}}
+          .flow-fly{position:absolute;font-family:'Syne',sans-serif;font-size:.68rem;font-weight:800;color:var(--gold);top:-17px;left:50%;transform:translateX(-50%);white-space:nowrap;animation:fFly 2.2s ease-in-out infinite;pointer-events:none;text-shadow:0 2px 8px rgba(201,168,76,.4);}
+          @keyframes fFly{0%{opacity:0;transform:translateX(-50%) translateY(5px)}15%{opacity:1}85%{opacity:1}100%{opacity:0;transform:translateX(-50%) translateY(-5px)}}
+          .flow-arw-label{font-size:.52rem;font-weight:600;color:var(--gold-dim);letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;}
+          .flow-arw-sub{font-size:.46rem;color:var(--muted);white-space:nowrap;}
+
+          .flow-cash{width:66px;height:54px;position:relative;flex-shrink:0;}
+          .flow-bill{width:60px;height:32px;border-radius:5px;background:linear-gradient(135deg,#166534,#15803d);border:1px solid rgba(255,255,255,.1);position:absolute;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.25);}
+          .flow-bill span{font-family:'Syne',sans-serif;font-size:.6rem;font-weight:800;color:rgba(255,255,255,.8);}
+          .flow-bill:nth-child(1){top:0;left:0;z-index:3;animation:bFloat 3s ease-in-out infinite;}
+          .flow-bill:nth-child(2){top:7px;left:3px;z-index:2;opacity:.75;}
+          .flow-bill:nth-child(3){top:14px;left:6px;z-index:1;opacity:.5;}
+          @keyframes bFloat{0%,100%{transform:translateY(0) rotate(-1.5deg)}50%{transform:translateY(-5px) rotate(-1.5deg)}}
+
+          .flow-bank{width:76px;height:54px;border-radius:10px;background:linear-gradient(135deg,var(--cream),#fff);border:1px solid var(--border);box-shadow:0 8px 24px rgba(10,10,15,.1);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;flex-shrink:0;}
+          .flow-bank-ico{font-size:1.3rem;animation:bkPulse 2.5s ease-in-out infinite;}
+          @keyframes bkPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+          .flow-bank-nm{font-family:'Syne',sans-serif;font-size:.46rem;font-weight:700;color:var(--ink);letter-spacing:.03em;}
+          .flow-bank-ac{font-size:.42rem;color:var(--muted);font-weight:300;}
+          .flow-bank-check{font-size:.6rem;color:#22C55E;font-weight:800;}
+        </style>
+        <div style="margin:14px 0 12px;">
+          <div class="flow-wrap">
+            <div class="flow-card">
+              <div class="flow-chip"></div>
+              <div class="flow-num">•••• •••• •••• 4521</div>
+              <div class="flow-logo">💳</div>
+              <div class="flow-shine"></div>
+            </div>
+            <div class="flow-arrow">
+              <div class="flow-arw-label">Mándalo</div>
+              <div class="flow-line">
+                <div class="flow-dot" style="animation-delay:0s;"></div>
+                <div class="flow-fly" id="heroFlowAmt">RD$10,000</div>
+              </div>
+              <div class="flow-arw-sub">4% + ITBIS</div>
+            </div>
+            <div class="flow-cash">
+              <div class="flow-bill"><span>RD$</span></div>
+              <div class="flow-bill"><span>RD$</span></div>
+              <div class="flow-bill"><span>RD$</span></div>
+            </div>
+            <div class="flow-arrow">
+              <div class="flow-arw-label">Transferencia</div>
+              <div class="flow-line">
+                <div class="flow-dot" style="animation-delay:1.1s;"></div>
+              </div>
+              <div class="flow-arw-sub">24–48h lab.</div>
+            </div>
+            <div class="flow-bank">
+              <div class="flow-bank-ico">🏦</div>
+              <div class="flow-bank-nm">Banco Popular</div>
+              <div class="flow-bank-ac">••••4521</div>
+              <div class="flow-bank-check">✓ Depositado</div>
+            </div>
+          </div>
+        </div>
+        <!-- END FLOW -->
+
+        <div class="fee-breakdown" style="margin-bottom:14px;">
           <div class="fee-row"><span class="fee-row-label">Monto a enviar</span><span class="fee-row-value" id="h-base">RD$10,000</span></div>
           <div class="fee-row"><span class="fee-row-label">Comisión (4%)</span><span class="fee-row-value" id="h-fee">RD$400</span></div>
           <div class="fee-row"><span class="fee-row-label">ITBIS (18% de comisión)</span><span class="fee-row-value" id="h-itbis">RD$72</span></div>
           <div class="fee-row total"><span class="fee-row-label">Total en tu tarjeta</span><span class="fee-row-value" id="h-total">RD$10,472</span></div>
         </div>
-        <div class="recipient-row">
-          <div class="recipient-avatar">JR</div>
-          <div class="recipient-info"><div class="recipient-name">Juan Rodríguez</div><div class="recipient-bank">Banco Popular · Cuenta ••••4521</div></div>
-          <div class="recipient-check">✓</div>
-        </div>
-        <button class="send-btn-demo" id="demoBtn" onclick="demoClick()">💸 Confirmar y Pagar</button>
+
+        <button class="send-btn-demo" id="demoBtn" onclick="demoClick()">💸 Quiero enviar — ir al formulario</button>
         <div class="card-footer-note">🔒 Transacción segura · SSL encriptado</div>
-        <div style="margin-top:10px;font-size:.68rem;color:var(--muted);text-align:center;line-height:1.5;padding:0 4px;">💡 Paga tu tarjeta antes de tu fecha límite y no generas intereses adicionales con tu banco — igual que cualquier compra.</div>
+        <div style="margin-top:8px;font-size:.64rem;color:var(--muted);text-align:center;line-height:1.5;padding:0 4px;">💡 Paga tu tarjeta antes de tu fecha límite y no generas intereses adicionales con tu banco.</div>
       </div>
       <div class="float-badge bottom-right">🏦 Evita la comisión de avance 6.25%</div>
     </div>
@@ -1048,136 +1120,235 @@
 
 <!-- PAYPAL MODAL -->
 <div id="paypalModal" style="display:none;position:fixed;inset:0;z-index:9995;align-items:center;justify-content:center;padding:16px;overflow-y:auto;">
-  <div onclick="closeModal()" style="position:absolute;inset:0;background:rgba(10,10,15,.88);backdrop-filter:blur(8px);"></div>
-  <div style="position:relative;background:var(--cream);border-radius:28px;padding:36px;max-width:540px;width:100%;box-shadow:0 40px 100px rgba(10,10,15,.4);border:1px solid var(--border);overflow:hidden;margin:auto;">
+  <div onclick="closeModal()" style="position:absolute;inset:0;background:rgba(10,10,15,.9);backdrop-filter:blur(10px);"></div>
+
+  <!-- MAIN STEPS MODAL -->
+  <div id="modalMain" style="position:relative;background:var(--cream);border-radius:28px;padding:32px;max-width:500px;width:100%;box-shadow:0 40px 100px rgba(10,10,15,.4);border:1px solid var(--border);overflow:hidden;margin:auto;">
     <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--gold),transparent);"></div>
-    <button onclick="closeModal()" style="position:absolute;top:14px;right:14px;background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--muted);line-height:1;">✕</button>
+    <button onclick="closeModal()" style="position:absolute;top:14px;right:14px;background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--muted);line-height:1;">✕</button>
 
     <!-- Header -->
-    <div style="text-align:center;margin-bottom:24px;">
-      <div style="font-size:2.8rem;margin-bottom:10px;">🎉</div>
-      <div style="font-family:'Syne',sans-serif;font-size:1.45rem;font-weight:800;color:var(--ink);letter-spacing:-.03em;margin-bottom:8px;">¡Orden registrada, <span id="modal-name"></span>!</div>
-      <p style="font-size:.88rem;color:var(--muted);font-weight:300;line-height:1.6;">Estás siendo parte del primer MVP de Anthony. Esto es lo que necesitas hacer ahora 👇</p>
+    <div style="text-align:center;margin-bottom:20px;">
+      <div style="font-size:2.5rem;margin-bottom:8px;">🎉</div>
+      <div style="font-family:'Syne',sans-serif;font-size:1.35rem;font-weight:800;color:var(--ink);letter-spacing:-.03em;margin-bottom:6px;">¡Orden lista, <span id="modal-name"></span>!</div>
+      <p style="font-size:.84rem;color:var(--muted);font-weight:300;line-height:1.5;">3 pasos simples y tu efectivo está en camino. 🇩🇴</p>
     </div>
 
     <!-- Order ID -->
-    <div style="background:rgba(201,168,76,.08);border:1.5px dashed rgba(201,168,76,.4);border-radius:16px;padding:16px 18px;margin-bottom:20px;text-align:center;">
-      <div style="font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Tu ID de Orden — guárdalo bien</div>
-      <div id="modal-order-id" style="font-family:'Syne',sans-serif;font-size:1.35rem;font-weight:800;color:var(--ink);letter-spacing:.04em;margin-bottom:12px;word-break:break-all;"></div>
-      <button id="copyBtn" onclick="copyOrderId()" style="background:var(--ink);color:var(--paper);border:none;padding:8px 20px;border-radius:100px;font-family:'Syne',sans-serif;font-size:.8rem;font-weight:700;cursor:pointer;transition:background .2s;">📋 Copiar ID</button>
+    <div style="background:rgba(201,168,76,.08);border:1.5px dashed rgba(201,168,76,.4);border-radius:14px;padding:14px 16px;margin-bottom:16px;text-align:center;">
+      <div style="font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">ID de Orden — guárdalo</div>
+      <div id="modal-order-id" style="font-family:'Syne',sans-serif;font-size:1.25rem;font-weight:800;color:var(--ink);letter-spacing:.04em;margin-bottom:10px;word-break:break-all;"></div>
+      <button id="copyBtn" onclick="copyOrderId()" style="background:var(--ink);color:var(--paper);border:none;padding:7px 18px;border-radius:100px;font-family:'Syne',sans-serif;font-size:.75rem;font-weight:700;cursor:pointer;">📋 Copiar ID</button>
     </div>
 
-    <!-- Discount applied note -->
-    <div id="modal-discount-note" style="display:none;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);border-radius:12px;padding:10px 14px;margin-bottom:12px;align-items:center;gap:10px;">
-      <span style="font-size:1.2rem;">🎁</span>
-      <div style="font-size:.8rem;color:#16A34A;font-weight:600;line-height:1.5;">¡Código <strong>FIRST100%OFF</strong> aplicado! La comisión fue eliminada — pagaste exactamente lo que se envía.</div>
-    </div>
-    <!-- Amount + USD note -->
-    <div style="background:rgba(10,10,15,.04);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
-      <span style="font-size:.85rem;color:var(--muted);">Total a pagar (en USD vía PayPal)</span>
-      <span id="modal-total" style="font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:800;color:var(--gold-dim);"></span>
-    </div>
-    <div style="background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);border-radius:10px;padding:10px 14px;margin-bottom:20px;font-size:.78rem;color:#92400e;line-height:1.6;">
-      ⚠️ <strong>Nota importante sobre la divisa:</strong> PayPal solo acepta pagos en dólares (USD) por ahora. El cargo se hará a tu tarjeta en USD, pero <strong>garantizo enviarte el equivalente exacto en pesos dominicanos (RD$) a la tasa de cambio del día</strong> — no pierdes ni un centavo. Sé que este primer proceso es un poco tedioso, pero una vez integremos el procesador de pagos automático será mucho más sencillo. ¡Gracias por ser parte del MVP! 🙏
+    <!-- Discount note -->
+    <div id="modal-discount-note" style="display:none;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);border-radius:10px;padding:10px 14px;margin-bottom:12px;align-items:center;gap:10px;">
+      <span style="font-size:1.1rem;">🎁</span>
+      <div style="font-size:.78rem;color:#16A34A;font-weight:600;">¡Código FIRST100%OFF aplicado! Comisión eliminada.</div>
     </div>
 
-    <!-- STEP 1: WhatsApp first -->
-    <div style="background:rgba(37,211,102,.07);border:1.5px solid rgba(37,211,102,.25);border-radius:16px;padding:18px 20px;margin-bottom:16px;">
-      <div style="font-family:'Syne',sans-serif;font-size:.85rem;font-weight:800;color:#16A34A;margin-bottom:12px;display:flex;align-items:center;gap:8px;">
-        <span style="background:#22C55E;color:white;width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:800;flex-shrink:0;">1</span>
-        Primero: escríbeme por WhatsApp 👇
+    <!-- Amount row -->
+    <div style="background:rgba(10,10,15,.04);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:.82rem;color:var(--muted);">Total a pagar vía PayPal</span>
+      <span id="modal-total" style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:var(--gold-dim);"></span>
+    </div>
+    <div style="background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.2);border-radius:10px;padding:9px 13px;margin-bottom:20px;font-size:.74rem;color:#92400e;line-height:1.5;">
+      ⚠️ PayPal cobra en USD. Anthony garantiza enviarte el equivalente exacto en RD$ a la tasa del día.
+    </div>
+
+    <!-- Progress bar -->
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:20px;">
+      <div id="step-pip-1" style="flex:1;height:4px;border-radius:4px;background:var(--gold);transition:background .4s;"></div>
+      <div id="step-pip-2" style="flex:1;height:4px;border-radius:4px;background:rgba(10,10,15,.1);transition:background .4s;"></div>
+      <div id="step-pip-3" style="flex:1;height:4px;border-radius:4px;background:rgba(10,10,15,.1);transition:background .4s;"></div>
+      <div style="font-size:.7rem;font-weight:600;color:var(--muted);" id="step-counter">Paso 1 de 3</div>
+    </div>
+
+    <!-- STEP 1: EMAIL -->
+    <div id="step1" style="">
+      <div style="font-family:'Syne',sans-serif;font-size:.9rem;font-weight:800;color:var(--ink);margin-bottom:10px;display:flex;align-items:center;gap:8px;">
+        <span style="background:var(--gold);color:var(--ink);width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:800;flex-shrink:0;">1</span>
+        Envíame tu solicitud por email
       </div>
-      <p style="font-size:.82rem;color:var(--muted);font-weight:300;line-height:1.6;margin-bottom:14px;">
-        Antes de pagar, haz clic abajo y envíame un WhatsApp con tu ID de orden y tus datos. Ahí coordinamos el método de verificación que prefieras. 😄
+      <p style="font-size:.82rem;color:var(--muted);font-weight:300;line-height:1.55;margin-bottom:14px;">
+        Un solo clic — se abre tu correo con <strong style="color:var(--ink);">todos los datos del formulario pre-llenados</strong>. Solo dale "Enviar". Así Anthony tiene todo registrado.
       </p>
-      <p style="font-size:.8rem;color:var(--muted);font-weight:300;line-height:1.6;margin-bottom:14px;padding:10px 14px;background:rgba(255,255,255,.6);border-radius:10px;border-left:3px solid #22C55E;">
-        🔐 <strong style="color:var(--ink);">Two-factor de confianza (elige tú):</strong> Para que sepas que es real del otro lado, puedo hacer lo que necesites — videollamada rápida, una foto haciendo algo específico que me pidas, o lo que se te ocurra. <em>Disclaimer: Anthony ya fue estafado antes, así que entiende perfectamente la desconfianza 😅 — por eso te lo propongo yo primero.</em>
-      </p>
-      <a id="modal-wa-link" href="https://wa.me/18492675109" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;background:#25D366;color:#fff;border-radius:12px;padding:14px;font-family:'Syne',sans-serif;font-size:.92rem;font-weight:700;text-decoration:none;box-shadow:0 4px 16px rgba(37,211,102,.3);">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        Escríbeme al (849) 267-5109
+      <a id="emailBtn" href="#" onclick="sendEmail(event)" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;background:var(--ink);color:var(--paper);border-radius:12px;padding:14px;font-family:'Syne',sans-serif;font-size:.92rem;font-weight:700;text-decoration:none;box-shadow:0 4px 16px rgba(10,10,15,.2);margin-bottom:12px;">
+        📧 Enviar email con mis datos
       </a>
+      <button onclick="markStepDone(1)" style="width:100%;background:rgba(34,197,94,.1);color:#16A34A;border:1.5px solid rgba(34,197,94,.3);border-radius:12px;padding:11px;font-family:'Syne',sans-serif;font-size:.84rem;font-weight:700;cursor:pointer;">
+        ✅ Ya envié el email — siguiente paso
+      </button>
     </div>
 
-    <!-- STEP 2: PayPal -->
-    <div style="background:rgba(0,48,135,.05);border:1.5px solid rgba(0,48,135,.15);border-radius:16px;padding:18px 20px;margin-bottom:16px;">
-      <div style="font-family:'Syne',sans-serif;font-size:.85rem;font-weight:800;color:#1D4ED8;margin-bottom:12px;display:flex;align-items:center;gap:8px;">
-        <span style="background:#2563EB;color:white;width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:800;flex-shrink:0;">2</span>
-        Luego: completa el pago en PayPal
+    <!-- STEP 2: WHATSAPP -->
+    <div id="step2" style="display:none;">
+      <div style="font-family:'Syne',sans-serif;font-size:.9rem;font-weight:800;color:var(--ink);margin-bottom:10px;display:flex;align-items:center;gap:8px;">
+        <span style="background:#25D366;color:white;width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:800;flex-shrink:0;">2</span>
+        Escríbeme por WhatsApp
       </div>
-      <ol style="font-size:.82rem;color:var(--muted);line-height:1.9;padding-left:18px;font-weight:300;margin-bottom:14px;">
+      <p style="font-size:.82rem;color:var(--muted);font-weight:300;line-height:1.55;margin-bottom:10px;">
+        Cuéntame qué te pareció la experiencia y coordina el método de verificación que prefieras. 😄
+      </p>
+      <div style="font-size:.78rem;color:var(--muted);font-weight:300;line-height:1.55;margin-bottom:14px;padding:10px 13px;background:rgba(255,255,255,.7);border-radius:10px;border-left:3px solid #25D366;">
+        🔐 <strong style="color:var(--ink);">Two-factor de confianza:</strong> Pídeme lo que quieras — videollamada, foto haciendo algo específico, lo que sea. Anthony ya fue estafado antes, así que lo propone él primero 😅
+      </div>
+      <a id="modal-wa-link" href="https://wa.me/18492675109" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;background:#25D366;color:#fff;border-radius:12px;padding:14px;font-family:'Syne',sans-serif;font-size:.92rem;font-weight:700;text-decoration:none;box-shadow:0 4px 16px rgba(37,211,102,.3);margin-bottom:12px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Escribir al (849) 267-5109
+      </a>
+      <button onclick="markStepDone(2)" style="width:100%;background:rgba(34,197,94,.1);color:#16A34A;border:1.5px solid rgba(34,197,94,.3);border-radius:12px;padding:11px;font-family:'Syne',sans-serif;font-size:.84rem;font-weight:700;cursor:pointer;">
+        ✅ Ya escribí por WhatsApp — siguiente
+      </button>
+    </div>
+
+    <!-- STEP 3: PAYPAL -->
+    <div id="step3" style="display:none;">
+      <div style="font-family:'Syne',sans-serif;font-size:.9rem;font-weight:800;color:var(--ink);margin-bottom:10px;display:flex;align-items:center;gap:8px;">
+        <span style="background:#003087;color:white;width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:800;flex-shrink:0;">3</span>
+        Completa el pago en PayPal
+      </div>
+      <ol style="font-size:.8rem;color:var(--muted);line-height:1.85;padding-left:16px;font-weight:300;margin-bottom:14px;">
         <li>Haz clic en el botón de PayPal abajo</li>
-        <li>Ingresa el monto en USD que te confirmé por WhatsApp</li>
-        <li>En <strong style="color:var(--ink);">"Descripción / Nota"</strong> pon tu ID: <strong style="color:var(--gold-dim);font-family:monospace;font-size:.85rem;" id="modal-order-id-2"></strong></li>
-        <li>Confirma el pago y envíame captura por WhatsApp</li>
+        <li>Ingresa el monto en USD confirmado por WhatsApp</li>
+        <li>En <strong style="color:var(--ink);">"Descripción / Nota"</strong> escribe: <strong style="color:var(--gold-dim);font-family:monospace;font-size:.82rem;" id="modal-order-id-2"></strong></li>
+        <li>Confirma y envíame captura por WhatsApp</li>
       </ol>
-      <a id="modal-pp-link" href="https://www.paypal.me/AnthonyRivasReyes" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;background:#003087;color:#fff;border-radius:12px;padding:14px;font-family:'Syne',sans-serif;font-size:.92rem;font-weight:700;text-decoration:none;box-shadow:0 4px 16px rgba(0,48,135,.25);">
+      <a id="modal-pp-link" href="https://www.paypal.me/AnthonyRivasReyes" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;background:#003087;color:#fff;border-radius:12px;padding:14px;font-family:'Syne',sans-serif;font-size:.92rem;font-weight:700;text-decoration:none;box-shadow:0 4px 16px rgba(0,48,135,.25);margin-bottom:12px;">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M7.144 19.532l1.049-5.751c.11-.626.691-1.081 1.33-1.081h6.001c4.897 0 7.698-2.383 8.432-7.098.046-.302.074-.594.088-.877.574.297 1.034.743 1.32 1.361.497 1.065.497 2.411.103 4.065-1.052 4.455-3.83 6.376-8.432 6.376H13.5c-.639 0-1.22.455-1.33 1.081l-1.256 6.897c-.05.272-.273.468-.543.468H8.244c-.35 0-.617-.308-.557-.66l.001-.005.456-2.501v-.003l1-5.272z"/></svg>
         Ir a PayPal · paypal.me/AnthonyRivasReyes
       </a>
+      <button onclick="markStepDone(3)" style="width:100%;background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--ink);border:none;border-radius:12px;padding:14px;font-family:'Syne',sans-serif;font-size:.92rem;font-weight:800;cursor:pointer;box-shadow:0 4px 20px rgba(201,168,76,.4);letter-spacing:.02em;">
+        🏁 ¡Listo! Finalizar mi solicitud
+      </button>
     </div>
 
-    <!-- Thank you -->
-    <div style="text-align:center;padding:16px 12px;background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(201,168,76,.03));border:1px solid rgba(201,168,76,.2);border-radius:14px;">
-      <div style="font-size:1.5rem;margin-bottom:8px;">🙏</div>
-      <p style="font-size:.82rem;color:var(--muted);font-weight:300;line-height:1.7;">
-        <strong style="color:var(--ink);">Gracias por ser parte del primer MVP de Anthony.</strong> Estás ayudando a construir algo que puede cambiar cómo los dominicanos manejan su liquidez. Será un camino largo — regulaciones, formalización, integraciones — pero todo empieza con personas como tú que confían en la idea. De verdad, gracias. 🇩🇴
-      </p>
+    <!-- Mini flow anim (shown after all steps) -->
+    <div id="modalFlowWidget" style="display:none;margin-top:16px;">
+      <style>
+        @keyframes flowSuccessPop{0%{opacity:0;transform:scale(.85)}60%{transform:scale(1.04)}100%{opacity:1;transform:scale(1)}}
+        .flow-success-done{animation:flowSuccessPop .6s ease forwards!important;}
+        .modal-flow-wrap{display:flex;align-items:center;justify-content:space-between;gap:6px;background:rgba(34,197,94,.04);border:1px solid rgba(34,197,94,.15);border-radius:14px;padding:12px 14px;}
+        .mf-card{width:48px;height:32px;border-radius:6px;background:linear-gradient(135deg,#0d1117,#0f3460);display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;}
+        .mf-arrow{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;}
+        .mf-line{height:2px;width:100%;background:linear-gradient(90deg,rgba(34,197,94,.3),#22C55E,rgba(34,197,94,.3));border-radius:2px;position:relative;}
+        .mf-dot{width:6px;height:6px;background:#22C55E;border-radius:50%;position:absolute;top:-2px;animation:fDot 1.8s ease-in-out infinite;box-shadow:0 0 6px rgba(34,197,94,.8);}
+        .mf-lbl{font-size:.48rem;font-weight:700;color:#16A34A;text-transform:uppercase;letter-spacing:.04em;}
+        .mf-cash{width:40px;height:32px;position:relative;flex-shrink:0;}
+        .mf-bill{width:36px;height:20px;border-radius:4px;background:linear-gradient(135deg,#166534,#15803d);position:absolute;display:flex;align-items:center;justify-content:center;}
+        .mf-bill span{font-family:'Syne',sans-serif;font-size:.44rem;font-weight:800;color:rgba(255,255,255,.9);}
+        .mf-bill:nth-child(1){top:0;left:0;z-index:3;animation:bFloat 2.5s ease-in-out infinite;}
+        .mf-bill:nth-child(2){top:5px;left:2px;z-index:2;opacity:.65;}
+        .mf-bill:nth-child(3){top:10px;left:4px;z-index:1;opacity:.4;}
+        .mf-bank{width:48px;height:32px;border-radius:6px;background:linear-gradient(135deg,#f0fdf4,#fff);border:1px solid rgba(34,197,94,.25);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;}
+        .mf-bank-ico{font-size:.85rem;}
+        .mf-bank-chk{font-size:.44rem;color:#16A34A;font-weight:800;}
+        .mf-status{text-align:center;margin-top:7px;font-size:.7rem;font-weight:600;color:#16A34A;}
+      </style>
+      <div class="modal-flow-wrap">
+        <div class="mf-card">💳</div>
+        <div class="mf-arrow"><div class="mf-lbl">Mándalo</div><div class="mf-line"><div class="mf-dot" style="animation-delay:0s;"></div></div></div>
+        <div class="mf-cash"><div class="mf-bill"><span>RD$</span></div><div class="mf-bill"><span>RD$</span></div><div class="mf-bill"><span>RD$</span></div></div>
+        <div class="mf-arrow"><div class="mf-lbl">Transferencia</div><div class="mf-line"><div class="mf-dot" style="animation-delay:.9s;"></div></div></div>
+        <div class="mf-bank"><div class="mf-bank-ico">🏦</div><div class="mf-bank-chk">✓ En camino</div></div>
+      </div>
+      <div class="mf-status">⚡ ¡Tu orden está siendo procesada!</div>
     </div>
-  </div>
+
+  </div><!-- end modalMain -->
+
+  <!-- RECEIPT MODAL (shown after Finalizar) -->
+  <div id="receiptCard" style="display:none;position:relative;max-width:420px;width:100%;margin:auto;">
+    <div id="receiptPrintable" style="background:var(--ink);border-radius:24px;padding:32px;box-shadow:0 40px 100px rgba(10,10,15,.5);border:1px solid rgba(201,168,76,.25);position:relative;overflow:hidden;">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--gold),transparent);"></div>
+      <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at top right,rgba(201,168,76,.06) 0%,transparent 60%);pointer-events:none;"></div>
+
+      <!-- Logo -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:24px;">
+        <div style="width:36px;height:36px;background:linear-gradient(135deg,var(--gold),var(--gold-light));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;">💸</div>
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:var(--paper);letter-spacing:-.02em;">mándalo</div>
+          <div style="font-size:.62rem;color:rgba(245,242,235,.4);font-weight:300;letter-spacing:.06em;text-transform:uppercase;">Comprobante MVP · Beta</div>
+        </div>
+        <div style="margin-left:auto;text-align:right;">
+          <div style="font-size:.6rem;color:rgba(245,242,235,.35);margin-bottom:2px;">Fecha</div>
+          <div id="rcp-date" style="font-size:.72rem;color:rgba(245,242,235,.6);font-weight:500;"></div>
+        </div>
+      </div>
+
+      <!-- Amount hero -->
+      <div style="text-align:center;margin-bottom:24px;padding:20px;background:rgba(255,255,255,.04);border-radius:16px;border:1px solid rgba(201,168,76,.12);">
+        <div style="font-size:.68rem;color:rgba(245,242,235,.4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;">Efectivo enviado</div>
+        <div id="rcp-amount" style="font-family:'Syne',sans-serif;font-size:2.6rem;font-weight:800;color:var(--gold);letter-spacing:-.04em;line-height:1;"></div>
+        <div id="rcp-usd" style="font-size:.78rem;color:rgba(245,242,235,.4);margin-top:6px;"></div>
+        <div id="rcp-discount-badge" style="display:none;margin-top:8px;display:none;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);border-radius:100px;padding:3px 12px;font-size:.7rem;font-weight:600;color:#4ADE80;display:inline-block;">🎁 0% comisión — FIRST100%OFF</div>
+      </div>
+
+      <!-- Details grid -->
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06);">
+          <span style="font-size:.78rem;color:rgba(245,242,235,.4);">ID de Orden</span>
+          <span id="rcp-order" style="font-family:monospace;font-size:.78rem;font-weight:700;color:var(--gold);letter-spacing:.04em;"></span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06);">
+          <span style="font-size:.78rem;color:rgba(245,242,235,.4);">De</span>
+          <span id="rcp-from" style="font-size:.78rem;font-weight:500;color:var(--paper);"></span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06);">
+          <span style="font-size:.78rem;color:rgba(245,242,235,.4);">Para</span>
+          <span id="rcp-to" style="font-size:.78rem;font-weight:500;color:var(--paper);"></span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06);">
+          <span style="font-size:.78rem;color:rgba(245,242,235,.4);">Banco destino</span>
+          <span id="rcp-bank" style="font-size:.78rem;font-weight:500;color:var(--paper);text-align:right;max-width:55%;"></span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06);">
+          <span style="font-size:.78rem;color:rgba(245,242,235,.4);">Cuenta</span>
+          <span id="rcp-acct" style="font-family:monospace;font-size:.78rem;font-weight:500;color:var(--paper);"></span>
+        </div>
+        <div id="rcp-desc-row" style="display:flex;justify-content:space-between;align-items:flex-start;padding:10px 0;">
+          <span style="font-size:.78rem;color:rgba(245,242,235,.4);">Concepto</span>
+          <span id="rcp-desc" style="font-size:.78rem;font-weight:500;color:var(--paper);text-align:right;max-width:60%;"></span>
+        </div>
+      </div>
+
+      <!-- Status -->
+      <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+        <div style="width:10px;height:10px;background:#22C55E;border-radius:50%;flex-shrink:0;box-shadow:0 0 8px rgba(34,197,94,.8);animation:pulse 2s infinite;"></div>
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-size:.8rem;font-weight:700;color:#4ADE80;">Procesando — 24–48h laborables</div>
+          <div style="font-size:.7rem;color:rgba(245,242,235,.4);font-weight:300;">Anthony está en proceso de confirmar y enviar</div>
+        </div>
+      </div>
+
+      <!-- Mandalo watermark -->
+      <div style="text-align:center;font-size:.64rem;color:rgba(245,242,235,.2);letter-spacing:.06em;text-transform:uppercase;">Mándalo MVP · mandalo.do · © 2025</div>
+    </div>
+
+    <!-- Action buttons -->
+    <div style="display:flex;gap:10px;margin-top:14px;">
+      <button onclick="shareReceipt()" style="flex:1;background:var(--gold);color:var(--ink);border:none;border-radius:12px;padding:14px;font-family:'Syne',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+        📤 Compartir
+      </button>
+      <button onclick="screenshotReceipt()" style="flex:1;background:rgba(255,255,255,.1);color:var(--paper);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:14px;font-family:'Syne',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+        📸 Captura
+      </button>
+      <button onclick="closeModal()" style="flex:1;background:rgba(255,255,255,.06);color:rgba(245,242,235,.6);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px;font-family:'Syne',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;">
+        ✕ Cerrar
+      </button>
+    </div>
+    <!-- Thanks message -->
+    <div style="margin-top:16px;text-align:center;background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.03));border:1px solid rgba(201,168,76,.2);border-radius:14px;padding:16px 20px;">
+      <div style="font-size:1.4rem;margin-bottom:8px;">🙏</div>
+      <div style="font-family:'Syne',sans-serif;font-size:.9rem;font-weight:800;color:var(--paper);margin-bottom:6px;">Gracias por ser de las primeras personas.</div>
+      <p style="font-size:.78rem;color:rgba(245,242,235,.5);font-weight:300;line-height:1.65;">Estás siendo parte del primer emprendimiento de Anthony — y eso no es poca cosa. Será un camino largo: regulaciones, formalización, integraciones reales. Pero todo empieza aquí, con personas como tú que confían en la idea. De verdad, gracias. 🇩🇴</p>
+    </div>
+  </div><!-- end receiptCard -->
+
 </div>
 <script>
-  // Show paypal modal as flex when open
-  const _modal=document.getElementById('paypalModal');
-  const _origOpen=_modal.classList.add.bind(_modal.classList);
-  Object.defineProperty(_modal,'classList',{value:new Proxy(_modal.classList,{
-    get(t,p){
-      if(p==='add') return (cls)=>{
-        if(cls==='open'){_modal.style.display='flex';document.body.style.overflow='hidden';}
-        return t.add(cls);
-      };
-      if(p==='remove') return (cls)=>{
-        if(cls==='open'){_modal.style.display='none';document.body.style.overflow='';}
-        return t.remove(cls);
-      };
-      const v=t[p];return typeof v==='function'?v.bind(t):v;
-    }
-  }),configurable:true});
-
-  // Mirror order ID to second span in modal
-  const _origShowPaypal=window.showPaypalModal;
-  window.showPaypalModal=function(orderId,total,name){
-    if(_origShowPaypal)_origShowPaypal(orderId,total,name);
-    const el2=document.getElementById('modal-order-id-2');
-    if(el2)el2.textContent=orderId;
-    // make WhatsApp link include order id
-    const waLink=document.querySelector('#paypalModal a[href*="wa.me"]');
-    const waLink2=document.getElementById('modal-wa-link');
-    if(waLink2){
-      const waMsg=
-'🚀 NUEVA SOLICITUD MÁNDALO MVP\n'+
-'================================\n'+
-'ID DE ORDEN: '+orderId+'\n\n'+
-'SOLICITANTE\n'+
-'Nombre: '+name+'\n'+
-'WhatsApp: '+(document.getElementById('f-whatsapp')||{value:''}).value+'\n'+
-'Cédula/Pasaporte: '+(document.getElementById('f-cedula')||{value:''}).value+'\n'+
-'Email: '+((document.getElementById('f-email')||{value:''}).value||'No proporcionado')+'\n\n'+
-'MONTO\n'+
-'Monto a enviar: '+(document.getElementById('f-amount')||{value:''}).value+' RD$\n'+
-'Total en USD (PayPal): $'+((parseFloat((document.getElementById('f-amount')||{value:'0'}).value)||0)/USD_RATE).toFixed(2)+' USD\n'+
-'Descuento: '+(isDiscountValid()?'FIRST100%OFF ✅ Comisión eliminada':'Ninguno')+'\n'+
-'Descripción: '+((document.getElementById('f-description')||{value:''}).value||'No especificado')+'\n\n'+
-'DESTINATARIO\n'+
-'Nombre: '+(document.getElementById('f-dest-name')||{value:''}).value+'\n'+
-'Cédula/Pasaporte: '+(document.getElementById('f-dest-cedula')||{value:''}).value+'\n'+
-'Banco: '+(document.getElementById('f-dest-bank')||{value:''}).value+'\n'+
-'Cuenta: '+(document.getElementById('f-dest-account')||{value:''}).value+'\n'+
-'Tipo: '+((document.getElementById('f-dest-acct-type')||{value:''}).value||'No especificado')+'\n\n'+
-'Quiero coordinar el pago en PayPal y hacer la verificación de identidad que necesites 🙌';
-      waLink2.href='https://wa.me/18492675109?text='+encodeURIComponent(waMsg);
-    }
-  };
+  // Modal display helpers (used by closeModal / showPaypalModal)
+  // USD_RATE and other globals are defined in the main script above
 </script>
 
 <!-- FOOTER -->
@@ -1228,6 +1399,9 @@
     document.getElementById('h-fee').textContent=v>0?fmt(fee):'—';
     document.getElementById('h-itbis').textContent=v>0?fmt(itbis):'—';
     document.getElementById('h-total').textContent=v>0?fmt(total):'—';
+    // sync flow widget amount
+    const fl=document.getElementById('heroFlowAmt');
+    if(fl)fl.textContent=v>0?fmt(v):'RD$??';
   }
   updateHeroCalc();
 
@@ -1292,6 +1466,18 @@
     return 'MND-'+ts+'-'+rand;
   }
 
+  // ── GOOGLE SHEETS INTEGRATION ──
+  // Replace YOUR_APPS_SCRIPT_URL with your deployed Apps Script URL
+  const SHEETS_URL = 'https://script.google.com/a/macros/commerce.glass/s/AKfycbxqrldI0wapblzyGJFVc-D1xPERX8DQiTCZyyAcJS39EZ683uXKBugUTp-YhQtDNBivLQ/exec';
+
+  function sendToGoogleSheets(data){
+    if(!SHEETS_URL || SHEETS_URL.includes('YOUR_')) return;
+    const form = new FormData();
+    Object.entries(data).forEach(([k,v]) => form.append(k, v||''));
+    fetch(SHEETS_URL, {method:'POST', body:form, mode:'no-cors'})
+      .catch(err => console.warn('Sheets send failed (non-critical):', err));
+  }
+
   function submitForm(e){
     e.preventDefault();
     const g=id=>document.getElementById(id).value.trim();
@@ -1313,6 +1499,27 @@
     const orderId=genOrderId();
     const btn=document.getElementById('submitBtn');
     btn.disabled=true;btn.innerHTML='⏳ Generando orden...';
+
+    // ── Send to Google Sheets (fire and forget) ──
+    sendToGoogleSheets({
+      Timestamp: new Date().toLocaleString('es-DO',{timeZone:'America/Santo_Domingo'}),
+      OrdenID: orderId,
+      Nombre: fields.name,
+      Cedula: fields.cedula,
+      WhatsApp: fields.whatsapp,
+      Email: fields.email||'',
+      MontoRD: amt,
+      ComisionRD: fee,
+      TotalRD: total,
+      TotalUSD: totalUSD,
+      Descuento: discountApplied ? 'FIRST100%OFF' : '',
+      Descripcion: fields.description||'',
+      DestinatarioNombre: fields.destName,
+      DestinatarioCedula: fields.destCedula,
+      Banco: fields.destBank,
+      Cuenta: fields.destAccount,
+      TipoCuenta: fields.destAcctType||''
+    });
 
     const msgBody=`
 NUEVA SOLICITUD DE TRANSFERENCIA — MÁNDALO MVP
@@ -1374,13 +1581,26 @@ Fecha/Hora: ${new Date().toLocaleString('es-DO',{timeZone:'America/Santo_Domingo
     },1200);
   }
 
+  // Store order data globally for receipt
+  let _orderData = {};
+
   function showPaypalModal(orderId, total, name, totalUSD, discountApplied){
     const modal=document.getElementById('paypalModal');
-    document.getElementById('modal-order-id').textContent=orderId;
-    // Show USD as primary, RD$ as secondary
     const usd = totalUSD || (total/USD_RATE).toFixed(2);
+
+    // Store for receipt
+    _orderData = {orderId, total, usd, name, discountApplied,
+      cedula: (document.getElementById('f-cedula')||{value:''}).value,
+      whatsapp: (document.getElementById('f-whatsapp')||{value:''}).value,
+      destName: (document.getElementById('f-dest-name')||{value:''}).value,
+      destBank: (document.getElementById('f-dest-bank')||{value:''}).value,
+      destAccount: (document.getElementById('f-dest-account')||{value:''}).value,
+      description: (document.getElementById('f-description')||{value:''}).value,
+    };
+
+    document.getElementById('modal-order-id').textContent=orderId;
     const totalEl=document.getElementById('modal-total');
-    totalEl.innerHTML='<span style="font-size:1.4rem;">USD $'+usd+'</span><br><span style="font-size:.8rem;font-weight:300;color:var(--muted);">≈ '+fmt(total)+' RD$</span>';
+    totalEl.innerHTML='<span style="font-size:1.3rem;font-weight:800;">USD $'+usd+'</span><br><span style="font-size:.75rem;font-weight:300;color:var(--muted);">≈ '+fmt(total)+' RD$</span>';
     if(discountApplied){
       const discEl=document.getElementById('modal-discount-note');
       if(discEl)discEl.style.display='flex';
@@ -1388,12 +1608,183 @@ Fecha/Hora: ${new Date().toLocaleString('es-DO',{timeZone:'America/Santo_Domingo
     document.getElementById('modal-name').textContent=name;
     const ppLink=document.getElementById('modal-pp-link');
     ppLink.href='https://www.paypal.me/AnthonyRivasReyes/'+usd+'USD';
-    modal.classList.add('open');
+
+    // Mirror order ID to step 3
+    const oid2=document.getElementById('modal-order-id-2');
+    if(oid2)oid2.textContent=orderId;
+
+    // Reset to step 1
+    showStep(1);
+    document.getElementById('receiptCard').style.display='none';
+    document.getElementById('modalMain').style.display='';
+
+    // Set up email link
+    buildEmailLink();
+
+    // Set up WA link
+    const waLink=document.getElementById('modal-wa-link');
+    if(waLink){
+      const d=_orderData;
+      const waMsg=
+'¡Hola Anthony! 👋 Usé Mándalo y aquí están mis datos:\n\n'+
+'🧾 ID DE ORDEN: '+orderId+'\n\n'+
+'👤 DATOS MÍOS\n'+
+'Nombre: '+d.name+'\n'+
+'Cédula/Pasaporte: '+d.cedula+'\n'+
+'WhatsApp: '+d.whatsapp+'\n'+
+'Email: '+(d.email||'No proporcionado')+'\n\n'+
+'💰 MONTO\n'+
+'Efectivo a enviar: '+fmt(total)+'\n'+
+'Total en PayPal: USD $'+usd+'\n'+
+(d.discountApplied?'Descuento: FIRST100%OFF ✅ (comisión eliminada)\n':'')+
+(d.description?'Concepto: '+d.description+'\n':'')+
+'\n'+
+'👤 DESTINATARIO\n'+
+'Nombre: '+d.destName+'\n'+
+'Cédula/Pasaporte: '+d.destCedula+'\n'+
+'Banco: '+d.destBank+'\n'+
+'Cuenta: '+d.destAccount+'\n'+
+(d.destAcctType?'Tipo: '+d.destAcctType+'\n':'')+
+'\n'+
+'🔐 ¿Cómo quieres que hagamos la verificación? Pídeme lo que necesites para confirmar que soy real 😄';
+      waLink.href='https://wa.me/18492675109?text='+encodeURIComponent(waMsg);
+    }
+
+    modal.style.display='flex';document.body.style.overflow='hidden';
     launchConfetti();
   }
 
+  function buildEmailLink(){
+    const d=_orderData;
+    const sub=encodeURIComponent('[MVP] Orden '+d.orderId+' — USD $'+d.usd+' — '+d.name+(d.discountApplied?' 🎁 DESCUENTO':' '));
+    const g=id=>(document.getElementById(id)||{value:''}).value.trim();
+    const body=encodeURIComponent(
+'NUEVA SOLICITUD DE TRANSFERENCIA — MÁNDALO MVP
+'+
+'===============================================
+'+
+'ID DE ORDEN: '+d.orderId+'
+'+
+'CÓDIGO DESCUENTO: '+(d.discountApplied?'FIRST100%OFF ✅ Comisión eliminada':'Ninguno')+'
+
+'+
+'DATOS DEL SOLICITANTE
+'+
+'Nombre: '+d.name+'
+'+
+'Cédula/Pasaporte: '+d.cedula+'
+'+
+'WhatsApp: '+d.whatsapp+'
+'+
+'Email: '+(g('f-email')||'No proporcionado')+'
+
+'+
+'MONTO DE LA TRANSACCIÓN
+'+
+'Efectivo a enviar: '+fmt(d.total)+'
+'+
+'Total en USD (PayPal): $'+d.usd+' USD
+'+
+'Tasa de cambio: ~'+USD_RATE+' RD$ por USD
+'+
+'Descuento: '+(d.discountApplied?'Comisión 0% (FIRST100%OFF)':'4% + ITBIS')+'
+'+
+'Descripción/Motivo: '+(d.description||'No especificado')+'
+
+'+
+'DATOS DEL DESTINATARIO
+'+
+'Nombre: '+d.destName+'
+'+
+'Cédula/Pasaporte: '+(g('f-dest-cedula')||'—')+'
+'+
+'Banco: '+d.destBank+'
+'+
+'Número de cuenta: '+d.destAccount+'
+'+
+'Tipo de cuenta: '+(g('f-dest-acct-type')||'No especificado')+'
+
+'+
+'Fecha/Hora: '+new Date().toLocaleString('es-DO',{timeZone:'America/Santo_Domingo'})
+    );
+    const emailLink=document.getElementById('emailBtn');
+    if(emailLink) emailLink.href='mailto:anthonyyrivas@hotmail.com?subject='+sub+'&body='+body;
+  }
+
+  function sendEmail(e){
+    // just open the mailto — button already has href set by buildEmailLink
+    // mark it visually
+    setTimeout(()=>{
+      const btn=document.getElementById('emailBtn');
+      if(btn){btn.style.background='#22C55E';btn.textContent='✅ Email abierto — ahora dale Enviar';}
+    },300);
+  }
+
+  function showStep(n){
+    [1,2,3].forEach(i=>{
+      const s=document.getElementById('step'+i);
+      if(s) s.style.display=(i===n)?'':'none';
+      const pip=document.getElementById('step-pip-'+i);
+      if(pip) pip.style.background=i<=n?'var(--gold)':'rgba(10,10,15,.1)';
+    });
+    const counter=document.getElementById('step-counter');
+    if(counter) counter.textContent='Paso '+n+' de 3';
+  }
+
+  function markStepDone(step){
+    if(step<3){
+      showStep(step+1);
+    } else {
+      // Step 3 done → show receipt
+      document.getElementById('modalMain').style.display='none';
+      buildReceipt();
+      document.getElementById('receiptCard').style.display='block';
+      launchConfetti();
+      // show flow widget
+      const mf=document.getElementById('modalFlowWidget');
+      if(mf){mf.style.display='block';mf.classList.remove('flow-success-done');void mf.offsetWidth;mf.classList.add('flow-success-done');}
+    }
+  }
+
+  function buildReceipt(){
+    const d=_orderData;
+    const now=new Date().toLocaleDateString('es-DO',{day:'2-digit',month:'long',year:'numeric',timeZone:'America/Santo_Domingo'});
+    document.getElementById('rcp-date').textContent=now;
+    document.getElementById('rcp-amount').textContent=fmt(d.total);
+    document.getElementById('rcp-usd').textContent='USD $'+d.usd+' · Tasa ~'+USD_RATE+' RD$';
+    document.getElementById('rcp-order').textContent=d.orderId;
+    document.getElementById('rcp-from').textContent=d.name;
+    document.getElementById('rcp-to').textContent=d.destName;
+    document.getElementById('rcp-bank').textContent=d.destBank;
+    document.getElementById('rcp-acct').textContent='••••'+d.destAccount.slice(-4);
+    document.getElementById('rcp-desc').textContent=d.description||'—';
+    if(d.discountApplied){
+      const db=document.getElementById('rcp-discount-badge');
+      if(db)db.style.display='inline-block';
+    }
+  }
+
+  function shareReceipt(){
+    const text='🎉 Acabo de usar Mándalo para enviar '+fmt(_orderData.total)+' en efectivo.\n'+
+      '💳→💸→🏦 Convierte tu crédito en efectivo real.\n'+
+      'Orden: '+_orderData.orderId+'\n'+
+      '¡Pruébalo en mandalo.do!';
+    if(navigator.share){
+      navigator.share({title:'Mi comprobante Mándalo',text:text}).catch(()=>{});
+    } else {
+      navigator.clipboard.writeText(text).then(()=>showToast('Texto copiado — pégalo donde quieras compartirlo 📋')).catch(()=>showToast('Copia el texto manualmente','error'));
+    }
+  }
+
+  function screenshotReceipt(){
+    showToast('Toma una captura de pantalla de este comprobante 📸 — o usa el botón Compartir');
+    // Scroll to ensure receipt is fully visible
+    document.getElementById('receiptCard').scrollIntoView({behavior:'smooth',block:'center'});
+  }
+
   function closeModal(){
-    document.getElementById('paypalModal').classList.remove('open');
+    const m=document.getElementById('paypalModal');
+    if(m){m.style.display='none';document.body.style.overflow='';}
   }
 
   function copyOrderId(){
